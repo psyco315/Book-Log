@@ -1,0 +1,347 @@
+/* Base styles - Desktop */
+.bgBox {
+    height: 100dvh;
+    width: 100dvw;
+    background-image: url('../../assets/bgImg.png');
+    background-size: cover;
+}
+
+.mainBox {
+    padding-left: min(2.5rem, 8%);
+    padding-right: min(2.5rem, 8%);
+}
+
+.subBox1 {
+    margin-top: .75rem;
+    margin-bottom: 3rem;
+}
+
+.auroraText {
+    font-size: 4.5rem;
+    margin-bottom: -.7rem;
+}
+
+.titleDesc {
+    font-size: 1.5rem;
+}
+
+.subBox2 {
+    margin-bottom: .75rem;
+}
+
+.lookingTxt {
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+}
+
+.searchInp {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    font-size: 1rem;
+}
+
+.yellowBtn {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    padding-left: .75rem;
+    padding-right: .75rem;
+    font-size: 1rem;
+}
+
+.subBox3 {
+    margin-top: .75rem;
+    margin-bottom: .75rem;
+}
+
+.nothingTxt {
+    font-size: 1.5rem;
+    padding-bottom: .75rem;
+}
+
+/* Large tablets and small desktops (1200px - 992px) */
+@media (max-width: 1199px) {
+    .mainBox {
+        padding-left: min(2rem, 6%);
+        padding-right: min(2rem, 6%);
+    }
+
+    .subBox1 {
+        margin-bottom: 2.5rem;
+    }
+
+    .auroraText {
+        font-size: 3.5rem;
+        margin-bottom: -.6rem;
+    }
+
+    .titleDesc {
+        font-size: 1.3rem;
+    }
+
+    .lookingTxt {
+        font-size: 1.3rem;
+        margin-bottom: .5rem;
+    }
+
+    .searchInp {
+        padding-top: .3rem;
+        padding-bottom: .3rem;
+        padding-left: .75rem;
+        padding-right: .75rem;
+        font-size: .95rem;
+    }
+
+    .yellowBtn {
+        padding-top: .3rem;
+        padding-bottom: .3rem;
+        padding-left: .75rem;
+        padding-right: .75rem;
+        font-size: .85rem;
+    }
+
+    .nothingTxt {
+        font-size: 1.3rem;
+        padding-bottom: .75rem;
+    }
+}
+
+/* Tablets (992px - 768px) */
+@media (max-width: 991px) {
+    .mainBox {
+        padding-left: min(1.5rem, 5%);
+        padding-right: min(1.5rem, 5%);
+    }
+
+    .subBox1 {
+        margin-top: .5rem;
+        margin-bottom: 2rem;
+    }
+
+    .auroraText {
+        font-size: 2.5rem;
+        margin-bottom: -.5rem;
+    }
+
+    .titleDesc {
+        font-size: 1.2rem;
+    }
+
+    .subBox2 {
+        margin-bottom: .5rem;
+    }
+
+    .lookingTxt {
+        font-size: 1.1rem;
+        margin-bottom: .4rem;
+    }
+
+    .searchInp {
+        padding-top: .35rem;
+        padding-bottom: .35rem;
+        padding-left: .6rem;
+        padding-right: .6rem;
+        font-size: .9rem;
+    }
+
+    .yellowBtn {
+        padding-top: .35rem;
+        padding-bottom: .35rem;
+        padding-left: .6rem;
+        padding-right: .6rem;
+        font-size: .8rem;
+    }
+
+    .subBox3 {
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+    }
+
+    .nothingTxt {
+        font-size: 1.1rem;
+        padding-bottom: .5rem;
+    }
+}
+
+/* Large phones (768px - 576px) */
+@media (max-width: 767px) {
+    .mainBox {
+        padding-left: min(1rem, 4%);
+        padding-right: min(1rem, 4%);
+    }
+
+    .subBox1 {
+        margin-top: .4rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auroraText {
+        font-size: 2rem;
+        margin-bottom: -.4rem;
+    }
+
+    .titleDesc {
+        font-size: 1.1rem;
+    }
+
+    .subBox2 {
+        margin-bottom: .7rem;
+    }
+
+    .lookingTxt {
+        font-size: 1.1rem;
+        margin-bottom: .3rem;
+    }
+
+    .searchInp {
+        padding-top: .35rem;
+        padding-bottom: .35rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        font-size: .85rem;
+    }
+
+    .yellowBtn {
+        padding-top: .35rem;
+        padding-bottom: .35rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        font-size: .75rem;
+    }
+
+    .subBox3 {
+        margin-top: .4rem;
+        margin-bottom: .4rem;
+    }
+
+    .nothingTxt {
+        font-size: 1.1rem;
+        padding-bottom: .4rem;
+    }
+}
+
+/* Small phones (576px and below) */
+@media (max-width: 575px) {
+    .bgBox {
+        background-image: url('../../assets/bgImg2.png');
+        background-size: cover;
+    }
+
+    .mainBox {
+        padding-left: min(.75rem, 3%);
+        padding-right: min(.75rem, 3%);
+    }
+
+    .subBox1 {
+        margin-top: .3rem;
+        margin-bottom: 1rem;
+    }
+
+    .auroraText {
+        font-size: 1.75rem;
+        margin-bottom: -.3rem;
+    }
+
+    .titleDesc {
+        font-size: .9rem;
+    }
+
+    .subBox2 {
+        margin-bottom: .7rem;
+    }
+
+    .lookingTxt {
+        font-size: 1rem;
+        margin-bottom: .25rem;
+    }
+
+    .searchInp {
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        font-size: .8rem;
+    }
+
+    .yellowBtn {
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        font-size: .7rem;
+    }
+
+    .subBox3 {
+        margin-top: .3rem;
+        margin-bottom: .3rem;
+    }
+
+    .nothingTxt {
+        font-size: 1rem;
+        padding-bottom: .3rem;
+    }
+}
+
+/* Extra small phones (320px and below) */
+@media (max-width: 320px) {
+    .bgBox {
+        background-image: url('../../assets/bgImg2.png');
+        background-size: cover;
+    }
+
+    .mainBox {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+
+    .subBox1 {
+        margin-top: .25rem;
+        margin-bottom: .8rem;
+    }
+
+    .auroraText {
+        font-size: 1.5rem;
+        margin-bottom: -.2rem;
+    }
+
+    .titleDesc {
+        font-size: .8rem;
+    }
+
+    .subBox2 {
+        margin-bottom: .75rem;
+
+    }
+
+    .lookingTxt {
+        font-size: .9rem;
+        margin-bottom: .2rem;
+    }
+
+    .searchInp {
+        padding-top: .15rem;
+        padding-bottom: .15rem;
+        padding-left: .3rem;
+        padding-right: .3rem;
+        font-size: .75rem;
+    }
+
+    .yellowBtn {
+        padding-top: .15rem;
+        padding-bottom: .15rem;
+        padding-left: .3rem;
+        padding-right: .3rem;
+        font-size: .65rem;
+    }
+
+    .subBox3 {
+        margin-top: .25rem;
+        margin-bottom: .25rem;
+    }
+
+    .nothingTxt {
+        font-size: .9rem;
+        padding-bottom: .25rem;
+    }
+}

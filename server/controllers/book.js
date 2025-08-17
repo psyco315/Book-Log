@@ -13,7 +13,8 @@ const fields = [
     'person',
     'ratings_average',
     'readinglog_count',
-    'subject_key'
+    'subject_key',
+    'lccn'
 ].join(',');
 
 export const searchBooks = async (req, res) => {
