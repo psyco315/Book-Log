@@ -7,8 +7,8 @@
 }
 
 .mainBox {
-    padding-left: min(2.5rem, 8%);
-    padding-right: min(2.5rem, 8%);
+    padding-left: min(4.5rem, 8%);
+    padding-right: min(4.5rem, 8%);
 }
 
 .subBox1 {
@@ -182,7 +182,7 @@
     }
 
     .titleDesc {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .subBox2 {
@@ -229,8 +229,8 @@
     }
 
     .mainBox {
-        padding-left: min(.75rem, 3%);
-        padding-right: min(.75rem, 3%);
+        padding-left: min(1.75rem, 3%);
+        padding-right: min(1.75rem, 3%);
     }
 
     .subBox1 {

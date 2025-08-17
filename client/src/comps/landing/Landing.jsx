@@ -26,7 +26,7 @@ const Landing = () => {
                         Looking for something?
                     </div>
                     <div className='flex justify-around items-center w-full'>
-                        <input type="text" placeholder='Enter book/author' className='searchInp bg-black/30 placeholder:text-white/30 text-white rounded-bl rounded-tl' />
+                        <input type="text" placeholder='Enter book/author' className='searchInp bg-white/10 placeholder:text-white/30 text-white rounded-bl rounded-tl' />
                         <button className='yellowBtn bg-[#FFE434] text-black rounded-br rounded-tr hover:scale-105 transition-transform duration-100 hover:cursor-pointer hover:bg-[#9a8a20] hover:text-white'>Search</button>
                     </div>
                 </div>
