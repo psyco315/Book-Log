@@ -7,6 +7,8 @@ import defaultCover from '../assets/defCover.png'
 import loadCover from '../assets/loadCover.png'
 import loadingAnimation from '../assets/loading_gray.json'
 
+import './home/HomePage.css'
+
 
 const BookCard = ({ data }) => {
     const {
@@ -92,7 +94,7 @@ const BookCard = ({ data }) => {
                            flex flex-col justify-center items-center text-white text-center
                            opacity-0 group-hover:opacity-100 transition-all duration-300'
                     animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.05 }}
+                    transition={{ duration: 0.2 }}
                 >
                     <h3 className='drop-shadow-lg'>
                         {title}
