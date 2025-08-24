@@ -2,7 +2,7 @@
 .bgBox {
     height: 100dvh;
     width: 100dvw;
-    background-image: url('../../assets/bgImg.png');
+    background-image: url('../../assets/bgImg.webp');
     background-size: cover;
 }
 
@@ -224,7 +224,7 @@
 /* Small phones (576px and below) */
 @media (max-width: 575px) {
     .bgBox {
-        background-image: url('../../assets/bgImg2.png');
+        background-image: url('../../assets/bgImg2.webp');
         background-size: cover;
     }
 
