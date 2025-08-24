@@ -20,30 +20,54 @@ const fields = [
 export const searchBooks = async (req, res) => {
     try {
         const {
-            query = '',
+            q = '',
+            title = '',
+            author = '',
+            subject = '',
             sort = 'readinglog',
             page = '1',
             limit = '10'
         } = req.query;
 
-        if (!query) {
+        // console.log(req.query)
+
+        if (!q && !title && !author && !subject) {
             return res.status(400).json({
                 success: false,
                 message: 'Search query is required'
             });
         }
 
+        const params = {
+            q: q,
+            // title: title,
+            // author: author,
+            // subject: subject,
+            fields,
+            sort: sort,
+            page: page,
+            limit: limit
+        }
+
+        if(title){
+            params['title'] = title
+        }
+        if(author){
+            params['author'] = author
+        }
+        if(subject){
+            params['subject'] = subject
+        }
+
         const response = await axios.get(OPEN_LIBRARY_URL, {
-            params: {
-                q: query,
-                fields,
-                sort: sort,
-                page: page,
-                limit: limit
-            }
+            params
         });
 
+        // console.log("Suces")
+
         const { docs, numFound, start } = response.data;
+
+        // const imgUrl = await getBookCoverLink(title, author)
 
         res.status(200).json({
             success: true,
@@ -56,7 +80,7 @@ export const searchBooks = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error fetching books:');
+        console.error('Error fetching books:', error);
         res.status(500).json({
             success: false,
             message: 'Error fetching books from OpenLibrary'
@@ -81,7 +105,7 @@ export const searchAuthors = async (req, res) => {
         }
 
         console.log(`Searching for author: ${q}`);
-        
+
         const response = await axios.get(AUTHOR_SEARCH_URL, {
             params: { q }
         });

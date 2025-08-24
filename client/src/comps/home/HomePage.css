@@ -1,0 +1,429 @@
+.homePage {
+  background: linear-gradient(to bottom, #2B2832, #201D24);
+  width: 100svw;
+  min-height: 100vh;
+}
+
+/* Parent button class */
+.navBarBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  padding: 0.5rem;
+}
+
+/* Hover effect */
+.navBarBtn:hover {
+  transform: scale(1.1);
+}
+
+/* Child image class */
+.navBarBtn img {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Child div class */
+.navBarBtn div {
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.totalContentBox {
+  margin-left: 2rem;
+  margin-right: 2rem;
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
+  width: 70%;
+  max-width: 1400px;
+}
+
+.totalContentBox>div {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bookCollec {
+  margin-bottom: 2rem;
+}
+
+.bookCollec>div:nth-child(1) {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  margin-bottom: 0.625rem;
+  font-weight: 600;
+}
+
+.bookCollec>div:nth-child(2) {
+  gap: 1.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.loadCover {
+  height: 20rem;
+  width: 13rem;
+}
+
+.loadAni {
+  height: 60px;
+  width: 60px;
+}
+
+.cardCover {
+  height: 20rem;
+  width: auto;
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.3);
+}
+
+.cardInfo {
+  padding: 1rem;
+}
+
+.cardInfo>h3 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.cardInfo>p {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.cardBox {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.cardBox::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cardBox::-webkit-scrollbar-track {
+  background-color: rgba(43, 40, 50, 0.5);
+  border-radius: 4px;
+}
+
+.cardBox::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+}
+
+.cardBox::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Large Desktop - ≥ 1200px */
+@media (min-width: 1200px) {
+  .totalContentBox {
+    width: 80%;
+  }
+
+  .bookCollec>div:nth-child(1) {
+    font-size: 1.75rem;
+    line-height: 2.25rem;
+  }
+}
+
+/* Desktop - ≤ 1199px */
+@media (max-width: 1199px) {
+  .totalContentBox {
+    width: 85%;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 18rem;
+    width: 11.5rem;
+  }
+
+  .loadAni {
+    height: 50px;
+    width: 50px;
+  }
+}
+
+/* Tablet Landscape - ≤ 991px */
+@media (max-width: 991px) {
+  .totalContentBox {
+    width: 90%;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+  }
+
+  .bookCollec>div:nth-child(1) {
+    font-size: 1.375rem;
+    line-height: 1.875rem;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 16rem;
+    width: 10rem;
+  }
+
+  .bookCollec>div:nth-child(2) {
+    gap: 1rem;
+  }
+
+  .navBarBtn img {
+    height: 1.125rem;
+    width: 1.125rem;
+  }
+
+  .navBarBtn div {
+    font-size: 0.8rem;
+  }
+}
+
+/* Tablet Portrait - ≤ 767px */
+@media (max-width: 767px) {
+  .totalContentBox {
+    width: 95%;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .bookCollec {
+    margin-bottom: 1.5rem;
+  }
+
+  .bookCollec>div:nth-child(1) {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 14rem;
+    width: 9rem;
+  }
+
+  .bookCollec>div:nth-child(2) {
+    gap: 0.75rem;
+    padding-bottom: 0.375rem;
+  }
+
+  .cardInfo>h3 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .cardInfo>p {
+    font-size: 0.8rem;
+    line-height: 1.125rem;
+  }
+
+  .navBarBtn {
+    padding: 0.375rem;
+  }
+
+  .navBarBtn img {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  .navBarBtn div {
+    font-size: 0.75rem;
+  }
+}
+
+/* Mobile Large - ≤ 575px */
+@media (max-width: 575px) {
+  .totalContentBox {
+    width: 95%;
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+  }
+
+  .bookCollec>div:nth-child(1) {
+    font-size: 1rem;
+    line-height: 1.625rem;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 10rem;
+    width: 6.5rem;
+  }
+
+  .loadAni {
+    height: 40px;
+    width: 40px;
+  }
+
+  .bookCollec>div:nth-child(2) {
+    gap: 0.625rem;
+  }
+
+  .cardInfo {
+    padding: 0.75rem;
+  }
+
+  .cardInfo>h3 {
+    font-size: 0.9rem;
+    line-height: 1.375rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .cardInfo>p {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .navBarBtn {
+    padding: 0.25rem;
+  }
+
+  .navBarBtn img {
+    height: 0.875rem;
+    width: 0.875rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .navBarBtn div {
+    font-size: 0.7rem;
+  }
+}
+
+/* Mobile Small - ≤ 320px */
+@media (max-width: 320px) {
+  .totalContentBox {
+    width: 95%;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+
+  .bookCollec {
+    margin-bottom: 1rem;
+  }
+
+  .bookCollec>div:nth-child(1) {
+    font-size: .8rem;
+    line-height: 1.5rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 8rem;
+    width: 5.2rem;
+  }
+
+  .loadAni {
+    height: 30px;
+    width: 30px;
+  }
+
+  .bookCollec>div:nth-child(2) {
+    gap: 0.5rem;
+  }
+
+  .cardInfo {
+    padding: 0.5rem;
+  }
+
+  .cardInfo>h3 {
+    font-size: 0.8rem;
+    line-height: 1.25rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .cardInfo>p {
+    font-size: 0.7rem;
+    line-height: 0.875rem;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .navBarBtn {
+    padding: 0.125rem;
+  }
+
+  .navBarBtn img {
+    height: 0.75rem;
+    width: 0.75rem;
+  }
+
+  .navBarBtn div {
+    font-size: 0.625rem;
+  }
+
+  .cardBox::-webkit-scrollbar {
+    height: 6px;
+  }
+}
+
+/* Custom responsive utilities */
+.responsive-text-lg {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.responsive-text-xl {
+  font-size: clamp(1.125rem, 3vw, 1.75rem);
+}
+
+.responsive-spacing {
+  margin: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+/* Smooth transitions for all responsive changes */
+* {
+  transition: font-size 0.1s ease, margin 0.1s ease, padding 0.1s ease, width 0.1s ease, height 0.1s ease;
+}
+
+/* Override transition for images to prevent layout shift */
+img {
+  transition: transform 0.1s ease, scale 0.1s ease;
+}
+
+/* Ensure proper spacing on very wide screens */
+@media (min-width: 1600px) {
+  .totalContentBox {
+    width: 75%;
+    max-width: 1600px;
+  }
+
+  .bookCollec>div:nth-child(2) {
+    gap: 1.5rem;
+  }
+
+  .loadCover,
+  .cardCover {
+    height: 22rem;
+    width: 14rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .homePage {
+    background: white;
+    color: black;
+  }
+
+  .navBarBtn,
+  .cardBox::-webkit-scrollbar {
+    display: none;
+  }
+}

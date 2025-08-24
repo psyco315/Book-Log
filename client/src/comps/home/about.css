@@ -1,0 +1,267 @@
+.infoMain {
+    padding-top: 3rem;
+    /* py-12 → 48px */
+    padding-bottom: 3rem;
+    /* py-12 → 48px */
+    padding-left: 1rem;
+    /* px-4 → 16px */
+    padding-right: 1rem;
+    /* px-4 → 16px */
+}
+
+.infoMain>div {
+    max-width: 72rem;
+    /* 6xl = 1152px */
+    margin-left: auto;
+    /* mx-auto → centers horizontally */
+    margin-right: auto;
+}
+
+.infoBox {
+    display: grid;
+    gap: 2rem;
+    /* gap-8 = 32px */
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.aboutBox>*+* {
+    margin-top: 1.5rem;
+    /* 24px */
+}
+
+.aboutBox>div:nth-child(1)>h2 {
+    font-size: 2.25rem;
+    /* text-4xl → 36px */
+    line-height: 2.5rem;
+    /* 40px */
+    font-weight: 700;
+    /* bold */
+    color: #ffffff;
+    /* white */
+    margin-bottom: 1rem;
+    /* mb-4 → 16px */
+}
+
+.aboutBox>div:nth-child(1)>div {
+    width: 4rem;
+    /* w-16 → 64px */
+    height: 0.25rem;
+    /* h-1 → 4px */
+    background-color: #2563eb;
+    /* bg-blue-600 */
+    margin-bottom: 1.5rem;
+    /* mb-6 → 24px */
+}
+
+.aboutBox>div:nth-child(2)>*+* {
+    margin-top: 1rem;
+    /* 16px */
+}
+
+.aboutBox>div:nth-child(2)>p {
+    font-size: 1.07rem;
+    /* 18px */
+    line-height: 1.625;
+    /* relaxed (26px when font-size is 16px, scales with size) */
+}
+
+.contactBox {
+    padding: 2rem;
+    /* p-8 */
+    height: fit-content;
+    /* h-fit */
+}
+
+.contactBox>h2 {
+    font-size: 1.5rem;
+    /* text-2xl */
+    line-height: 2rem;
+    /* matches Tailwind’s line-height for text-2xl */
+    font-weight: 700;
+    /* font-bold */
+    color: #ffffff;
+    /* text-white */
+    margin-bottom: 1.5rem;
+    /* mb-6 */
+    position: relative;
+    /* relative */
+    z-index: 10;
+    /* z-10 */
+}
+
+.contactBox>div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.contactBtn {
+    padding: 1rem;
+    /* 16px */
+    width: 100%;
+}
+
+.contactBtn>div:nth-child(2) {
+    width: 3rem;
+    /* 48px */
+    height: 3rem;
+    /* 48px */
+    margin-right: 1rem;
+    /* 16px */
+}
+
+.contactBtn>div:nth-child(2)>img {
+    width: 2rem;
+    /* 32px */
+    height: 2rem;
+    /* 32px */
+}
+
+
+
+
+/*---------------------------------------------------------------------------------------------------------*/
+
+@media (min-width: 1200px) {}
+
+@media (max-width: 1199px) {}
+
+@media (max-width: 991px) {}
+
+@media (max-width: 767px) {}
+
+@media (max-width: 575px) {}
+
+@media (max-width: 320px) {
+    .infoMain {
+        padding-top: .1rem;
+        /* py-12 → 48px */
+        padding-bottom: 1rem;
+        /* py-12 → 48px */
+        padding-left: .3rem;
+        /* px-4 → 16px */
+        padding-right: .3rem;
+        /* px-4 → 16px */
+    }
+
+    .infoMain>div {
+        margin-left: auto;
+        /* mx-auto → centers horizontally */
+        margin-right: auto;
+    }
+
+    .infoBox {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .aboutBox>*+* {
+        margin-top: 1rem;
+        /* 24px */
+    }
+
+    .aboutBox>div:nth-child(1)>h2 {
+        font-size: 1rem;
+        /* text-4xl → 36px */
+        line-height: 2.5rem;
+        /* 40px */
+        font-weight: 700;
+        /* bold */
+        color: #ffffff;
+        /* white */
+        margin-bottom: .1rem;
+        /* mb-4 → 16px */
+    }
+
+    .aboutBox>div:nth-child(1)>div {
+        width: 4rem;
+        /* w-16 → 64px */
+        height: 0.15rem;
+        /* h-1 → 4px */
+        background-color: #2563eb;
+        /* bg-blue-600 */
+        margin-bottom: .2rem;
+        /* mb-6 → 24px */
+    }
+
+    .aboutBox>div:nth-child(2)>*+* {
+        margin-top: .6rem;
+        /* 16px */
+    }
+
+    .aboutBox>div:nth-child(2)>p {
+        font-size: .7rem;
+        /* 18px */
+        line-height: 1.625;
+        /* relaxed (26px when font-size is 16px, scales with size) */
+    }
+
+    .contactBox {
+        padding: .8rem;
+        /* p-8 */
+        height: fit-content;
+        /* h-fit */
+    }
+
+    .contactBox>h2 {
+        font-size: 1rem;
+        /* text-2xl */
+        line-height: 2rem;
+        /* matches Tailwind’s line-height for text-2xl */
+        font-weight: 700;
+        /* font-bold */
+        color: #ffffff;
+        /* text-white */
+        margin-bottom: .5rem;
+        /* mb-6 */
+        position: relative;
+        /* relative */
+        z-index: 10;
+        /* z-10 */
+    }
+
+    .contactBox>div:nth-child(2) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .contactBtn {
+        padding: .6rem;
+        /* 16px */
+        width: 100%;
+    }
+
+    .contactBtn>div:nth-child(2) {
+        width: 1.3rem;
+        /* 48px */
+        height: 1.3rem;
+        /* 48px */
+        margin-right: .8rem;
+        /* 16px */
+    }
+
+    .contactBtn>div:nth-child(2)>img {
+        width: 1rem;
+        /* 32px */
+        height: 1rem;
+        /* 32px */
+    }
+
+    .contactBtn>div:nth-child(3){
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .contactBtn>div:nth-child(3)>p1{
+        font-size: .8rem;
+    }
+
+    .contactBtn>div:nth-child(3)>p2{
+        font-size: .6rem;
+    }
+}

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
+@plugin 'tailwind-scrollbar' {
+    nocompatible: true;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -82,7 +84,11 @@
   from {
     transform: translateY(0);}
   to {
-    transform: translateY(calc(-100% - var(--gap)));}}}
+    transform: translateY(calc(-100% - var(--gap)));}}
+  --animate-gradient: gradient 8s linear infinite;
+  @keyframes gradient {
+  to {
+    background-position: var(--bg-size, 300%) 0;}}}
 
 :root {
   --radius: 0.625rem;
