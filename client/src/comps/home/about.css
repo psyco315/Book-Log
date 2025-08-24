@@ -128,7 +128,7 @@
 
 /*---------------------------------------------------------------------------------------------------------*/
 
-@media (min-width: 1200px) {}
+/* @media (min-width: 1200px) {}
 
 @media (max-width: 1199px) {}
 
@@ -136,7 +136,178 @@
 
 @media (max-width: 767px) {}
 
-@media (max-width: 575px) {}
+@media (max-width: 575px) {} */
+
+@media (max-width: 1199px) {
+    .infoMain {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+
+    .aboutBox>div:nth-child(1)>h2 {
+        font-size: 2rem;
+        line-height: 2.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .aboutBox>div:nth-child(2)>p {
+        font-size: 1rem;
+    }
+
+    .contactBox {
+        padding: 1.8rem;
+    }
+
+    .contactBtn>div:nth-child(2) {
+        width: 2.8rem;
+        height: 2.8rem;
+    }
+}
+
+@media (max-width: 991px) {
+    .infoMain {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 0.6rem;
+        padding-right: 0.6rem;
+    }
+
+    .aboutBox>div:nth-child(1)>h2 {
+        font-size: 1.8rem;
+        line-height: 2.2rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .aboutBox>div:nth-child(2)>p {
+        font-size: 0.95rem;
+    }
+
+    .contactBox {
+        padding: 1.5rem;
+        width: 100%;
+    }
+
+    .contactBtn>div:nth-child(2) {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-right: .8rem;
+    }
+
+
+    .contactBtn>div:nth-child(2)>img {
+        width: 2rem;
+        /* 32px */
+        height: 2rem;
+        /* 32px */
+    }
+
+    .contactBtn>div:nth-child(3)>p1 {
+        font-size: 1rem;
+    }
+
+    .contactBtn>div:nth-child(3)>p2 {
+        font-size: .8rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .infoMain {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .infoBox {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .aboutBox>div:nth-child(1)>h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .aboutBox>div:nth-child(2)>p {
+        font-size: 0.9rem;
+    }
+
+    .contactBox {
+        padding: 1.2rem;
+    }
+
+    .contactBtn>div:nth-child(2) {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .contactBtn>div:nth-child(2)>img {
+        width: 1.5rem;
+        /* 32px */
+        height: 1.5rem;
+        /* 32px */
+    }
+}
+
+@media (max-width: 575px) {
+    .infoMain {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
+
+    .aboutBox>div:nth-child(1)>h2 {
+        font-size: 1.2rem;
+        line-height: 1.8rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .aboutBox>div:nth-child(1)>div {
+        height: 0.2rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .aboutBox>div:nth-child(2)>p {
+        font-size: 0.8rem;
+    }
+
+    .contactBox {
+        padding: 1rem;
+    }
+
+    .contactBox>h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .contactBtn {
+        padding: 0.8rem;
+    }
+
+    .contactBtn>div:nth-child(2) {
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-right: 0.9rem;
+    }
+
+    .contactBtn>div:nth-child(2)>img {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .contactBtn>div:nth-child(3)>p1 {
+        font-size: 0.9rem;
+    }
+
+    .contactBtn>div:nth-child(3)>p2 {
+        font-size: 0.7rem;
+    }
+}
 
 @media (max-width: 320px) {
     .infoMain {
@@ -254,12 +425,6 @@
         /* 32px */
         height: 1rem;
         /* 32px */
-    }
-
-    .contactBtn>div:nth-child(3) {
-        display: flex;
-        flex-direction: column;
-        align-items: start;
     }
 
     .contactBtn>div:nth-child(3)>p1 {

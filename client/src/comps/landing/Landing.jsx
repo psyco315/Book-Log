@@ -18,7 +18,7 @@ const Landing = () => {
                         BookStop
                     </AuroraText>
                     <TypingAnimation className='titleDesc font-light'>
-                        Inspired from that one ✉️📦 site, but for books
+                        Inspired from that one ✉️📦d site, but for books
                     </TypingAnimation>
                 </div>
 

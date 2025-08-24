@@ -3,6 +3,7 @@ import homeImg from '../../assets/home.png'
 import listImg from '../../assets/list.png'
 import profileImg from '../../assets/profile.png'
 import searchImg from '../../assets/search.png'
+import './navbar.css'
 
 import { SparklesText } from "@/components/magicui/sparkles-text";
 import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
@@ -25,7 +26,7 @@ const Navbar = () => {
 
     return (
         <motion.div
-            className='navBar pb-2 pt-3.5 px-1 bg-[#141219] w-full flex justify-center items-center'
+            className='navBar'
             initial={{
                 y: -100,
                 opacity: 0
@@ -39,33 +40,30 @@ const Navbar = () => {
                 ease: "easeOut"
             }}
         >
-            <div className='w-[70%] flex justify-between items-center'>
-                <div className='ml-2.5 flex gap-2 items-center'>
-                    <img src={profileImg} alt="" className='h-7 w-7' />
-                    <SparklesText sparklesCount='8' className='text-2xl font-bold '>
+            <div className='navbar-container'>
+                <div className='navbar-logo'>
+                    <img src={profileImg} alt="" className='navbar-logo-img' />
+                    <SparklesText sparklesCount='8' className='navbar-title'>
                         BookStop
                     </SparklesText>
                 </div>
 
                 {/* Search Bar */}
-                <div className='flex items-center gap-3'>
-                    <div className='relative flex items-center'>
+                <div className='navbar-search'>
+                    <div className='search-input-container'>
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={handleSearchChange}
                             placeholder="Search a book/author..."
-                            className='px-4 py-2 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 w-64'
+                            className='search-input'
                         />
-                        <img src={searchImg} alt="Search" className='absolute left-3 h-4 w-4 opacity-70' />
+                        <img src={searchImg} alt="Search" className='search-icon' />
                     </div>
                     <motion.button
                         onClick={handleSearch}
                         disabled={!searchQuery.trim()}
-                        className={`px-4 py-2 rounded-full font-medium transition-all duration-100 ${searchQuery.trim()
-                            ? 'bg-[#507CDC] hover:from-blue-700 hover:to-purple-700 text-white cursor-pointer'
-                            : 'bg-white/10 text-white/40 cursor-not-allowed'
-                            }`}
+                        className={`search-btn ${searchQuery.trim() ? 'search-btn-active' : 'search-btn-disabled'}`}
                         whileHover={searchQuery.trim() ? { scale: 1.05 } : {}}
                         whileTap={searchQuery.trim() ? { scale: 0.95 } : {}}
                     >
@@ -73,22 +71,22 @@ const Navbar = () => {
                     </motion.button>
                 </div>
 
-                <div className='mr-2.5 gap-5 flex justify-around items-center'>
+                <div className='navbar-nav'>
                     <Link to='/home'>
                         <button className='navBarBtn'>
-                            <img src={homeImg} alt="" className='' />
-                            <div className=''>Home</div>
+                            <img src={homeImg} alt="" />
+                            <div>Home</div>
                         </button>
                     </Link>
                     <button className='navBarBtn'>
-                        <img src={listImg} alt="" className='' />
-                        <div className=''>Library</div>
+                        <img src={listImg} alt="" />
+                        <div>Library</div>
                     </button>
                     <button className='navBarBtn'>
-                        <img src={profileImg} alt="" className='' />
-                        <div className=''>Profile</div>
+                        <img src={profileImg} alt="" />
+                        <div>Profile</div>
                     </button>
-                    <button className='text-[1.2rem] hover:cursor-pointer hover:scale-105 transition-transform duration-100'>
+                    <button className='signin-btn'>
                         <AnimatedGradientText>
                             SignIn
                         </AnimatedGradientText>
