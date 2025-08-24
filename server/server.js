@@ -28,6 +28,10 @@ app.use((err, req, res, next) => {
     });
 });
 
+app.get('/test', (req, res) => {
+    res.send('Hello from Express!');
+});
+
 app.get('/api/test', (req, res) => {
     res.send('Hello from Express!');
 });
