@@ -118,6 +118,11 @@
     /* 32px */
 }
 
+.contactBtn>div:nth-child(3) {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
 
 
 
@@ -251,17 +256,17 @@
         /* 32px */
     }
 
-    .contactBtn>div:nth-child(3){
+    .contactBtn>div:nth-child(3) {
         display: flex;
         flex-direction: column;
         align-items: start;
     }
 
-    .contactBtn>div:nth-child(3)>p1{
+    .contactBtn>div:nth-child(3)>p1 {
         font-size: .8rem;
     }
 
-    .contactBtn>div:nth-child(3)>p2{
+    .contactBtn>div:nth-child(3)>p2 {
         font-size: .6rem;
     }
 }

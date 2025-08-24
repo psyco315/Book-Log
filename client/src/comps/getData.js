@@ -1,3 +1,4 @@
+import api from "./api";
 import axios from 'axios'
 
 export const fetchBooks = async ({ q = "", author = "", title = "", subject = "" }) => {
@@ -15,9 +16,9 @@ export const fetchBooks = async ({ q = "", author = "", title = "", subject = ""
             sort: "currently_reading"
         });
 
-        const url = `http://localhost:3000/api/book/search?${params.toString()}`;
+        const url = `/api/book/search?${params.toString()}`;
 
-        const { data } = await axios.get(url);
+        const { data } = await api.get(url);
         return data;
     } catch (err) {
         console.error(`Error fetching "${title}":`, err.message);
