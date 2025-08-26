@@ -1,0 +1,138 @@
+.globalDiv {
+    background: linear-gradient(to bottom, #2B2832, #201D24);
+    color: white;
+    min-height: 100dvh;
+    min-width: 100dvw;
+}
+
+.contentParent {
+    margin-top: 2rem;
+
+    width: 75%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.photoCol {}
+
+.descCol {
+    max-width: 50%;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.author {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.descBox {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.pubYear {
+    margin-bottom: .5rem;
+    font-weight: 300;
+}
+
+.description {
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.genreBox {
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.genreTitle {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: .5rem;
+}
+
+.genreList {
+    column-gap: 0.5rem;
+    /* 8px */
+    row-gap: .3rem;
+}
+
+.genreItem {
+    padding-left: .3rem;
+    padding-right: .3rem;
+    padding-bottom: .1rem;
+    padding-top: .08rem;
+    border-radius: .2rem;
+}
+
+.genreItem:hover {
+    transform: scale(1.03);
+    transition: all 0.2s ease;
+}
+
+.rateCol>div {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: .6rem;
+    padding-bottom: 1rem;
+}
+
+.userBox {
+    gap: 1.5rem;
+}
+
+.logBtnList {
+    column-gap: 1rem;
+}
+
+.logBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logBtn>img {
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.logBtn>div {
+    font-size: .9rem;
+}
+
+.rateStarBox{
+    gap: .3rem;
+}
+
+.rateStarBox>div:nth-child(1) {
+    gap: .5rem;
+}
+
+.rateStarBox>div:nth-child(1)>img {
+    height: 2.2rem;
+    width: 2.2rem;
+}
+
+.ratingBox>div:nth-child(1){
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: .6rem;
+}
+
+.ratingBox>div:nth-child(2){
+    gap: .5rem;
+}
+
+.ratingBox>div:nth-child(2)>img{
+    height: 3rem;
+    width: 3rem;
+}
+
+.ratingBox>div:nth-child(2)>div{
+    font-size: 1.5rem;
+}

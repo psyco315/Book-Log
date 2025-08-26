@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import BookCard from "../BookCard"
+import { Link } from 'react-router-dom'
 
 const BookCollection = ({ groupTitle, bookData }) => {
     const itemsRef = useRef(null)
@@ -24,7 +25,7 @@ const BookCollection = ({ groupTitle, bookData }) => {
     }, [])
 
     return (
-        <div className='bookCollec'> 
+        <div className='bookCollec'>
             <div>
                 {groupTitle}
             </div>

@@ -10,11 +10,11 @@ const fields = [
     'number_of_pages_median',
     'title',
     'subject',
-    'person',
     'ratings_average',
     'readinglog_count',
-    'subject_key',
-    'lccn'
+    'isbn',
+    'lccn',
+    'subtitle'
 ].join(',');
 
 export const searchBooks = async (req, res) => {
@@ -24,6 +24,7 @@ export const searchBooks = async (req, res) => {
             title = '',
             author = '',
             subject = '',
+            isbn ='',
             sort = 'readinglog',
             page = '1',
             limit = '10'
@@ -31,7 +32,7 @@ export const searchBooks = async (req, res) => {
 
         // console.log(req.query)
 
-        if (!q && !title && !author && !subject) {
+        if (!q && !title && !author && !subject && !isbn) {
             return res.status(400).json({
                 success: false,
                 message: 'Search query is required'
@@ -40,10 +41,7 @@ export const searchBooks = async (req, res) => {
 
         const params = {
             q: q,
-            // title: title,
-            // author: author,
-            // subject: subject,
-            fields,
+            fields: fields,
             sort: sort,
             page: page,
             limit: limit
@@ -58,6 +56,12 @@ export const searchBooks = async (req, res) => {
         if(subject){
             params['subject'] = subject
         }
+        if(isbn){
+            params['isbn'] = isbn
+        }
+        if(limit){
+            params['limit'] = limit
+        }
 
         const response = await axios.get(OPEN_LIBRARY_URL, {
             params
@@ -66,6 +70,7 @@ export const searchBooks = async (req, res) => {
         // console.log("Suces")
 
         const { docs, numFound, start } = response.data;
+        console.log(docs)
 
         // const imgUrl = await getBookCoverLink(title, author)
 
