@@ -3,6 +3,12 @@
     color: white;
     min-height: 100dvh;
     min-width: 100dvw;
+    display: flex;
+    /* flex */
+    flex-direction: column;
+    /* flex-col */
+    align-items: center;
+    /* items-center */
 }
 
 .contentParent {
@@ -13,7 +19,15 @@
     justify-content: space-around;
 }
 
-.photoCol {}
+.photoCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.photoCol>img {
+    width: 13rem;
+}
 
 .descCol {
     max-width: 50%;
@@ -74,6 +88,17 @@
     transition: all 0.2s ease;
 }
 
+.rateCol {
+    display: flex;
+    /* flex */
+    flex-direction: column;
+    /* flex-col */
+    align-items: center;
+    /* items-center */
+    gap: 1rem;
+    /* gap-4 (Tailwind's spacing scale: 4 = 1rem = 16px) */
+}
+
 .rateCol>div {
     width: 100%;
     padding-left: 1rem;
@@ -83,7 +108,14 @@
 }
 
 .userBox {
-    gap: 1.5rem;
+    gap: 1rem;
+    display: flex;
+    /* flex */
+    flex-direction: column;
+    /* flex-col */
+    align-items: center;
+    /* items-center */
+    justify-content: center;
 }
 
 .logBtnList {
@@ -105,7 +137,7 @@
     font-size: .9rem;
 }
 
-.rateStarBox{
+.rateStarBox {
     gap: .3rem;
 }
 
@@ -118,21 +150,756 @@
     width: 2.2rem;
 }
 
-.ratingBox>div:nth-child(1){
+.postRev {
+    padding-left: .6rem;
+    padding-right: .6rem;
+    padding-top: .4rem;
+    padding-bottom: .4rem;
+    background-color: #FFE434;
+    color: black;
+    border-radius: .2rem;
+}
+
+.postRev:hover {
+    color: white;
+    background-color: #9a8a20;
+}
+
+.ratingBox {
+    display: flex;
+    /* flex */
+    flex-direction: column;
+    /* flex-col */
+    align-items: center;
+    /* items-center */
+    gap: 1rem;
+}
+
+.ratingBox>div>div:nth-child(1) {
     font-size: 1.2rem;
     font-weight: 500;
     margin-bottom: .6rem;
 }
 
-.ratingBox>div:nth-child(2){
+.ratingBox>div>div:nth-child(2) {
     gap: .5rem;
 }
 
-.ratingBox>div:nth-child(2)>img{
+.ratingBox>div>div:nth-child(2)>img {
     height: 3rem;
     width: 3rem;
 }
 
-.ratingBox>div:nth-child(2)>div{
+.ratingBox>div>div:nth-child(2)>div {
     font-size: 1.5rem;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 1360px) {
+    .contentParent {
+        margin-top: 2rem;
+        width: 90%;
+    }
+
+    .photoCol>img {
+        width: 12rem;
+    }
+
+    .descCol {
+        max-width: 50%;
+    }
+
+    .title {
+        font-size: 2.8rem;
+        font-weight: 700;
+    }
+
+    .author {
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .description {
+        font-size: 1.1rem;
+        font-weight: 300;
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 1100px) {
+    .contentParent {
+        margin-top: 2rem;
+        width: 90%;
+    }
+
+    .photoCol>img {
+        width: 11rem;
+    }
+
+    .title {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .author {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .description {
+        font-size: 1.1rem;
+        font-weight: 300;
+    }
+
+    .userBox {
+        gap: 1.2rem;
+    }
+
+    .logBtn>img {
+        height: 2.3rem;
+        width: 2.3rem;
+    }
+
+    .logBtn>div {
+        font-size: .85rem;
+    }
+
+    .rateStarBox>div:nth-child(1)>img {
+        height: 2.2rem;
+        width: 2.2rem;
+    }
+
+    .ratingBox>div:nth-child(2) {
+        gap: .5rem;
+    }
+
+    .ratingBox>div:nth-child(2)>img {
+        height: 2.8rem;
+        width: 2.8rem;
+    }
+
+    .ratingBox>div:nth-child(2)>div {
+        font-size: 1.4rem;
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 991px) {}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 991px) {
+    .contentParent {
+        margin-top: 1rem;
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .photoCol {
+        order: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .photoCol>img {
+        width: 12rem;
+    }
+
+    .descCol {
+        order: 3;
+        margin-top: .5rem;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .author {
+        font-size: 1.5rem;
+    }
+
+    .descBox {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .pubYear {
+        font-size: 1rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .genreItem {
+        padding-left: .3rem;
+        padding-right: .3rem;
+        padding-bottom: .1rem;
+        padding-top: .08rem;
+        border-radius: .2rem;
+        font-size: 1rem;
+    }
+
+    .genreItem:hover {
+        transform: scale(1.03);
+        transition: all 0.2s ease;
+    }
+
+    .rateCol {
+        order: 2;
+        margin-top: .5rem;
+        flex-direction: row;
+
+    }
+
+    .rateCol>div {
+        height: 100%;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: .4rem;
+        padding-bottom: .6rem;
+    }
+
+    .userBox {
+        width: fit-content;
+        gap: 1.5rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .logBtnList {
+        column-gap: 1rem;
+        flex-shrink: 0;
+        order: 1;
+    }
+
+    .logBtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logBtn>img {
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+
+    .logBtn>div {
+        font-size: .9rem;
+    }
+
+    .rateStarBox {
+        flex-shrink: 0;
+        order: 3;
+        gap: .3rem;
+    }
+
+    .rateStarBox>div:nth-child(1) {
+        gap: .5rem;
+    }
+
+    .rateStarBox>div:nth-child(1)>img {
+        height: 2.2rem;
+        width: 2.2rem;
+    }
+
+    .postRev {
+        flex-shrink: 0;
+        order: 2;
+    }
+
+    .ratingBox {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ratingBox>div>div:nth-child(1) {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: .6rem;
+    }
+
+    .ratingBox>div>div:nth-child(2) {
+        gap: .5rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>img {
+        height: 2.6rem;
+        width: 2.6rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>div {
+        font-size: 1.3rem;
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 575px) {
+    .contentParent {
+        margin-top: .5rem;
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .photoCol {
+        order: 1;
+    }
+
+    .photoCol>img {
+        width: 10rem;
+    }
+
+    .altDesc {
+        width: 60%;
+    }
+
+    .descCol {
+        order: 3;
+        margin-top: .5rem;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 1.6rem;
+    }
+
+    .author {
+        font-size: 1.2rem;
+    }
+
+    .descBox {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .pubYear {
+        font-size: .9rem;
+    }
+
+    .description {
+        font-size: .9rem;
+    }
+
+    .genreItem {
+        padding-left: .3rem;
+        padding-right: .3rem;
+        padding-bottom: .1rem;
+        padding-top: .08rem;
+        border-radius: .2rem;
+        font-size: .8rem;
+    }
+
+    .genreItem:hover {
+        transform: scale(1.03);
+        transition: all 0.2s ease;
+    }
+
+    .rateCol {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        order: 2;
+        margin-top: 1rem;
+        gap: .5rem;
+        flex-grow: 0;
+    }
+
+    .rateCol>div {
+        width: 80%;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: .4rem;
+        padding-bottom: .8rem;
+    }
+
+    .userBox {
+        column-gap: 2rem;
+        row-gap: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .logBtnList {
+        column-gap: .4rem;
+        flex-shrink: 0;
+        order: 1;
+    }
+
+    .logBtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logBtn>img {
+        height: 3rem;
+        width: 3rem;
+    }
+
+    .logBtn>div {
+        font-size: .8rem;
+    }
+
+    .postRev {
+        flex-shrink: 0;
+        order: 2;
+        font-size: 1rem;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        padding-top: .2rem;
+        padding-bottom: .2rem;
+    }
+
+    .rateStarBox {
+        flex-shrink: 0;
+        order: 3;
+        gap: .3rem;
+    }
+
+    .rateStarBox>div:nth-child(1) {
+        gap: .5rem;
+    }
+
+    .rateStarBox>div:nth-child(1)>img {
+        height: 2.2rem;
+        width: 2.5rem;
+    }
+
+    .ratingBox {
+        flex-direction: row;
+    }
+
+    .ratingBox>div>div:nth-child(1) {
+        font-size: .9rem;
+        font-weight: 500;
+        margin-bottom: .3rem;
+    }
+
+    .ratingBox>div>div:nth-child(2) {
+        gap: .5rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>img {
+        height: 2.7rem;
+        width: 2.7rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>div {
+        font-size: 1rem;
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 450px) {
+    .contentParent {
+        margin-top: .5rem;
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .photoCol {
+        order: 1;
+    }
+
+    .photoCol>img {
+        width: 8rem;
+    }
+
+    .descCol {
+        order: 3;
+        margin-top: .5rem;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 1.4rem;
+    }
+
+    .author {
+        font-size: 1.1rem;
+    }
+
+    .descBox {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .pubYear {
+        font-size: .8rem;
+    }
+
+    .description {
+        font-size: .9rem;
+    }
+
+    .genreItem {
+        padding-left: .3rem;
+        padding-right: .3rem;
+        padding-bottom: .1rem;
+        padding-top: .08rem;
+        border-radius: .2rem;
+        font-size: .8rem;
+    }
+
+    .genreItem:hover {
+        transform: scale(1.03);
+        transition: all 0.2s ease;
+    }
+
+    .rateCol {
+        order: 2;
+        margin-top: 1rem;
+        gap: .5rem;
+    }
+
+    .rateCol>div {
+        width: 100%;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        padding-top: .4rem;
+        padding-bottom: .6rem;
+    }
+
+    .userBox {
+        column-gap: 2rem;
+        row-gap: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .logBtnList {
+        column-gap: .4rem;
+        flex-shrink: 0;
+        order: 1;
+    }
+
+    .logBtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logBtn>img {
+        height: 3rem;
+        width: 3rem;
+    }
+
+    .logBtn>div {
+        font-size: .8rem;
+    }
+
+    .postRev {
+        flex-shrink: 0;
+        order: 2;
+        font-size: 1rem;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        padding-top: .2rem;
+        padding-bottom: .2rem;
+    }
+
+    .rateStarBox {
+        flex-shrink: 0;
+        order: 3;
+        gap: .3rem;
+    }
+
+    .rateStarBox>div:nth-child(1) {
+        gap: .5rem;
+    }
+
+    .rateStarBox>div:nth-child(1)>img {
+        height: 2.2rem;
+        width: 2.5rem;
+    }
+
+    .ratingBox {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ratingBox>div>div:nth-child(1) {
+        font-size: .9rem;
+        font-weight: 500;
+        margin-bottom: .3rem;
+    }
+
+    .ratingBox>div>div:nth-child(2) {
+        gap: .5rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>img {
+        height: 2.7rem;
+        width: 2.7rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>div {
+        font-size: 1rem;
+    }
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------*/
+
+@media (max-width: 340px) {
+    .contentParent {
+        margin-top: .5rem;
+        width: 95%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .photoCol {
+        order: 1;
+    }
+
+    .photoCol>img {
+        width: 6rem;
+    }
+
+    .descCol {
+        order: 3;
+        margin-top: .5rem;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 1.3rem;
+    }
+
+    .author {
+        font-size: 1rem;
+    }
+
+    .descBox {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .pubYear {
+        font-size: .7rem;
+    }
+
+    .description {
+        font-size: .8rem;
+    }
+
+    .genreItem {
+        padding-left: .3rem;
+        padding-right: .3rem;
+        padding-bottom: .1rem;
+        padding-top: .08rem;
+        border-radius: .2rem;
+        font-size: .7rem;
+    }
+
+    .genreItem:hover {
+        transform: scale(1.03);
+        transition: all 0.2s ease;
+    }
+
+    .rateCol {
+        order: 2;
+        margin-top: 1rem;
+        gap: .5rem;
+    }
+
+    .rateCol>div {
+        width: 100%;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        padding-top: .4rem;
+        padding-bottom: .6rem;
+    }
+
+    .userBox {
+        column-gap: 1.3rem;
+        row-gap: 1rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .logBtnList {
+        column-gap: .4rem;
+        flex-shrink: 0;
+        order: 1;
+    }
+
+    .logBtn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .logBtn>img {
+        height: 2rem;
+        width: 2rem;
+    }
+
+    .logBtn>div {
+        font-size: .7rem;
+    }
+
+    .postRev {
+        flex-shrink: 0;
+        order: 2;
+        font-size: .8rem;
+        padding-left: .4rem;
+        padding-right: .4rem;
+        padding-top: .2rem;
+        padding-bottom: .2rem;
+    }
+
+    .rateStarBox {
+        flex-shrink: 0;
+        order: 3;
+        gap: .3rem;
+    }
+
+    .rateStarBox>div:nth-child(1) {
+        gap: .5rem;
+    }
+
+    .rateStarBox>div:nth-child(1)>img {
+        height: 2.2rem;
+        width: 2.5rem;
+    }
+
+    .ratingBox {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ratingBox>div>div:nth-child(1) {
+        font-size: .9rem;
+        font-weight: 500;
+        margin-bottom: .3rem;
+    }
+
+    .ratingBox>div>div:nth-child(2) {
+        gap: .5rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>img {
+        height: 2.7rem;
+        width: 2.7rem;
+    }
+
+    .ratingBox>div>div:nth-child(2)>div {
+        font-size: 1rem;
+    }
 }

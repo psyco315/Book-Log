@@ -41,7 +41,11 @@
   max-width: 1400px;
 }
 
-.totalContentBox>div {
+.totalContentBox>div:nth-child(1) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.totalContentBox>div:nth-child(2) {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { AuthProvider } from './context/auth.jsx'
 import Landing from './comps/landing/Landing'
 import HomePage from './comps/home/HomePage'
 import Book from './comps/book/Book';
@@ -9,14 +10,16 @@ function App() {
 
   return (
     <Router>
-      <div className='hover:cursor-default overflow-x-hidden'>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/book/:isbn" element={<Book />} />
-          {/* <Route path="/books/:id" element={<BookDetail />} /> */}
-        </Routes>
-      </div>
+      <AuthProvider>
+        <div className='hover:cursor-default overflow-x-hidden'>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/book/:isbn" element={<Book />} />
+            {/* <Route path="/books/:id" element={<BookDetail />} /> */}
+          </Routes>
+        </div>
+      </AuthProvider>
     </Router>
   )
 }

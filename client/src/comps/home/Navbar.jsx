@@ -9,8 +9,10 @@ import { SparklesText } from "@/components/magicui/sparkles-text";
 import { AnimatedGradientText } from "@/components/magicui/animated-gradient-text";
 import { motion } from "motion/react"
 import { Link } from 'react-router-dom'
+import { useAuth } from '@/context/auth'
 
 const Navbar = () => {
+    const { authModal, setAuthModal } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearchChange = (e) => {
@@ -86,7 +88,7 @@ const Navbar = () => {
                         <img src={profileImg} alt="" />
                         <div>Profile</div>
                     </button>
-                    <button className='signin-btn'>
+                    <button className='signin-btn' onClick={() => setAuthModal(true)}>
                         <AnimatedGradientText>
                             SignIn
                         </AnimatedGradientText>

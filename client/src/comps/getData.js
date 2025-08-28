@@ -98,13 +98,13 @@ export const imgFunc1 = async (title, author) => {
             return data.url;
         }
 
-        console.warn(`No cover found for "${cleanTitle}"`);
+        // console.warn(`No cover found for "${cleanTitle}"`);
         return null
     } catch (err) {
-        console.error(
-            `Failed to fetch book cover with API for "${cleanTitle}":`,
-            err.message
-        );
+        // console.error(
+        //     `Failed to fetch book cover with API for "${cleanTitle}":`,
+        //     err.message
+        // );
         return null;
     }
 };
@@ -112,7 +112,7 @@ export const imgFunc1 = async (title, author) => {
 export const imgFunc2 = async (lccn, title) => {
     // Check if lccn is provided and is an array
     if (!lccn || !Array.isArray(lccn) || lccn.length === 0) {
-        console.log(`Invalid lccn for "${title}"`)
+        // console.log(`Invalid lccn for "${title}"`)
         return null;
     }
 
@@ -142,14 +142,14 @@ export const imgFunc2 = async (lccn, title) => {
     }
 
     // Return null if no valid image was found
-    console.log(`No cover found wiht lccn for "${title}"`)
+    // console.log(`No cover found wiht lccn for "${title}"`)
     return null;
 };
 
 export const imgFunc3 = async (isbn, title) => {
     // Check if lccn is provided and is an array
     if (!isbn || !Array.isArray(isbn) || isbn.length === 0) {
-        console.log(`Invalid isbn for "${title}"`)
+        // console.log(`Invalid isbn for "${title}"`)
         return null;
     }
 
@@ -179,6 +179,7 @@ export const imgFunc3 = async (isbn, title) => {
     }
 
     // Return null if no valid image was found
-    console.log(`No cover found wiht isbn for "${title}"`)
+    // console.log(`No cover found wiht isbn for "${title}"`)
     return null;
 };
+

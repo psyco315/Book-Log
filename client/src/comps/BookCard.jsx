@@ -5,7 +5,7 @@ import Lottie from 'react-lottie-player'
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { imgFunc1, imgFunc2, imgFunc3 } from './getData';
 import defaultCover from '../assets/defCover.png'
-import loadCover from '../assets/loadCover.png'
+import loadingCover from '../assets/loadCover.png'
 import loadingAnimation from '../assets/loading_gray.json'
 
 import './home/HomePage.css'
@@ -76,7 +76,7 @@ const BookCard = ({ data }) => {
                         isLoading ?
                             <div
                                 className="loadCover flex items-center justify-center bg-cover bg-center"
-                                style={{ backgroundImage: `url(${loadCover})` }}
+                                style={{ backgroundImage: `url(${loadingCover})` }}
                             >
                                 <Lottie
                                     loop

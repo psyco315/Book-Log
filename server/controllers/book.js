@@ -70,7 +70,7 @@ export const searchBooks = async (req, res) => {
         // console.log("Suces")
 
         const { docs, numFound, start } = response.data;
-        console.log(docs)
+        // console.log(docs)
 
         // const imgUrl = await getBookCoverLink(title, author)
 
@@ -109,7 +109,7 @@ export const searchAuthors = async (req, res) => {
             });
         }
 
-        console.log(`Searching for author: ${q}`);
+        // console.log(`Searching for author: ${q}`);
 
         const response = await axios.get(AUTHOR_SEARCH_URL, {
             params: { q }
@@ -124,7 +124,7 @@ export const searchAuthors = async (req, res) => {
         }
 
         const authorKeys = response.data.docs.map(author => author.key?.replace('/authors/', '')).filter(Boolean);
-        console.log(`Found ${authorKeys.join(',')} authors for query: ${q}`);
+        // console.log(`Found ${authorKeys.join(',')} authors for query: ${q}`);
 
         // Fetch detailed information for each author
         const authorDetails = await Promise.all(
@@ -178,7 +178,7 @@ export const getAuthor = async (req, res) => {
             });
         }
 
-        console.log(`Fetching author details for: ${authorKey}`);
+        // console.log(`Fetching author details for: ${authorKey}`);
 
         const response = await axios.get(`${AUTHOR_URL}/${authorKey}.json`);
 

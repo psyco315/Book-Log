@@ -3,6 +3,8 @@ import Navbar from '../home/Navbar'
 import { useParams } from "react-router-dom";
 import { motion } from 'motion/react'
 import { fetchBooks, getDesc } from '../getData';
+import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
+import Lottie from 'react-lottie-player'
 import './book.css'
 
 import defCover from '../../assets/defCover.png'
@@ -12,11 +14,29 @@ import readList from '../../assets/readList.webp'
 import star from '../../assets/star.png'
 import star2 from '../../assets/star2.png'
 import status from '../../assets/status.webp'
+import loadingCover from '../../assets/loadCover.png'
+import loadingAnimation from '../../assets/loading_gray.json'
 import { title } from 'process';
 
 const Book = () => {
     const { isbn } = useParams();   // 👈 get isbn from URL
     const [book, setBook] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
+    const [screenWidth, setScreenWidth] = useState(0);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            setScreenWidth(width);
+            setIsMobile(width < 991);
+        };
+
+        // Set initial values
+        handleResize();
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const cleanSubjects = (subjects) => {
         if (!Array.isArray(subjects)) return [];
@@ -47,7 +67,7 @@ const Book = () => {
                         finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
                     }
 
-                    console.log(finalData)
+                    // console.log(finalData)
                     setBook(finalData);
 
                     // Then load description using the book data we just got
@@ -73,10 +93,46 @@ const Book = () => {
         loadBookAndDescription();
     }, [isbn]);
 
+    const [imgLink, setImgLink] = useState(defCover);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadCover = async () => {
+        try {
+            // console.log('Finding img with API')
+            let coverUrl = await imgFunc1(book.title, book.author_name);
+
+            if (!coverUrl) {
+                // console.log('Finding img with lccn')
+                coverUrl = await imgFunc2(book.lccn, book.title);
+            }
+
+            if (!coverUrl) {
+                // console.log('Finding img with isbn')
+                coverUrl = await imgFunc3(book.isbn, book.title);
+            }
+
+            if (coverUrl) {
+                // console.log("Final:", title, "-", coverUrl)
+                setImgLink(coverUrl);
+            }
+
+        } catch (error) {
+            console.error('Error loading cover:', error);
+            setImgLink(defCover);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // console.log("Book changed:", book)
+        loadCover();
+    }, [book]);
+
     if (!book) return <p>Loading...</p>;
 
     return (
-        <div className='globalDiv flex flex-col items-center'>
+        <div className='globalDiv'>
             <Navbar />
 
             <motion.div className='contentParent'
@@ -91,19 +147,58 @@ const Book = () => {
                     ease: "easeOut"
                 }}
             >
-                <div className='photoCol flex flex-col items-center'>
-                    <img src={defCover} alt="" />
-                    <div>Click to see more covers</div>
+                <div className='photoCol'>
+                    {/* <img src={defCover} alt="" /> */}
+
+                    {
+                        isLoading ?
+                            <div
+                                className="loadCover flex items-center justify-center bg-cover bg-center"
+                                style={{ backgroundImage: `url(${loadingCover})` }}
+                            >
+                                <Lottie
+                                    loop
+                                    animationData={loadingAnimation}
+                                    play
+                                    className='loadAni'
+                                />
+                            </div>
+
+                            :
+                            <motion.img
+                                src={imgLink}
+                                alt={book.title}
+                            />
+                    }
+
+                    <div className='altDesc'>
+                        <div className={`title ${isMobile ? '' : 'hidden'}`}>
+                            {book.title}
+                        </div>
+
+                        <div className={`author ${isMobile ? '' : 'hidden'}`}>
+                            {book?.author_name?.map((author, idx) => (
+                                <span key={idx}>
+                                    {author}
+                                    {idx < book.author_name.length - 1 ? ", " : ""}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div className={`pubYear ${isMobile ? '' : 'hidden'}`}>
+                            First Publish: {book.first_publish_year || "Unavailable"}
+                        </div>
+                    </div>
                 </div>
 
                 {/* -------------------------------------------------------------------------------------------------------------------- */}
 
                 <div className='descCol'>
-                    <div className='title'>
+                    <div className={`title ${isMobile ? 'hidden' : ''}`}>
                         {book.title}
                     </div>
 
-                    <div className="author">
+                    <div className={`author ${isMobile ? 'hidden' : ''}`}>
                         {book?.author_name?.map((author, idx) => (
                             <span key={idx}>
                                 {author}
@@ -113,7 +208,7 @@ const Book = () => {
                     </div>
 
                     <div className='descBox'>
-                        <div className='pubYear'>
+                        <div className={`pubYear ${isMobile ? 'hidden' : ''}`}>
                             First Publish: {book.first_publish_year || "Unavailable"}
                         </div>
                         <div className='description'>
@@ -134,16 +229,16 @@ const Book = () => {
                             ))}
                         </div>
                     </div>
-
+{/* 
                     <div className='comments'>
                         comments
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* -------------------------------------------------------------------------------------------------------------------- */}
 
-                <div className='rateCol flex flex-col items-center gap-4'>
-                    <div className='userBox flex flex-col items-center bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
+                <div className='rateCol'>
+                    <div className='userBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
                         <div className='logBtnList flex justify-around'>
                             <button className='logBtn'>
                                 <img src={status} alt="" />
@@ -168,7 +263,7 @@ const Book = () => {
                         </div>
 
                         <div className='rateStarBox flex flex-col items-center'>
-                            <div className=' flex justify-around'>
+                            <div className='flex justify-around'>
                                 <img src={star} alt="" />
                                 <img src={star} alt="" />
                                 <img src={star} alt="" />
@@ -186,13 +281,24 @@ const Book = () => {
                         </div>
                     </div>
 
-                    <div className='ratingBox flex flex-col items-center bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
+                    <div className='ratingBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
                         <div>
-                            Average Rating
+                            <div>
+                                Average Rating
+                            </div>
+                            <div className='flex justify-center items-center'>
+                                <img src={star2} alt="" />
+                                <div>{book.ratings_average}</div>
+                            </div>
                         </div>
-                        <div className='flex justify-center items-center'>
-                            <img src={star2} alt="" />
-                            <div>{book.ratings_average}</div>
+                        <div>
+                            <div>
+                                BookStop Rating
+                            </div>
+                            <div className='flex justify-center items-center'>
+                                <img src={star2} alt="" />
+                                <div>{book.ratings_average}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
