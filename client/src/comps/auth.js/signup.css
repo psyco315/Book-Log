@@ -1,0 +1,325 @@
+/* Modal Backdrop */
+.modal-backdrop {
+    margin: 0;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.modal-backdrop>div {
+    width: 100dvw;
+}
+
+.modal-backdrop>div>div:nth-child(2) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Container */
+.modal-container {
+    position: relative;
+    width: 100%;
+    max-width: 26rem;
+    max-height: 90vh;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+    overflow-y: auto;
+    background: linear-gradient(to bottom, rgba(43, 40, 50, 0.889), rgba(32, 29, 36, 0.884));
+    backdrop-filter: blur(8px);
+    transform: translateY(0);
+    transition: all 300ms ease-out;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+.modal-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+/* Glossy Effects */
+.modal-highlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.highlight-top {
+    position: absolute;
+    top: -2rem;
+    left: -2rem;
+    width: 10rem;
+    height: 10rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.05);
+    filter: blur(24px);
+}
+
+.highlight-bottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 75%;
+    height: 6rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    filter: blur(12px);
+    opacity: 0.1;
+}
+
+/* Close Button */
+.close-button {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 60;
+    margin-left: .5rem;
+    padding: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    transition: all 200ms;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+.close-button:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+}
+
+/* Header Section */
+.modal-header {
+    padding: 1.5rem 0 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.header-icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.header-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Form Section */
+.form-container {
+    padding: 0 2rem 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Error Message */
+.error-message {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: rgba(220, 38, 38, 0.4);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 0.5rem;
+    color: rgb(254, 202, 202);
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+/* Form Fields */
+.form-field {
+    margin-bottom: 0.75rem;
+}
+
+.field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding-left: 0.75rem;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border-radius: 0.5rem;
+    transition: all 200ms;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-input:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.form-input.error {
+    border-color: rgba(248, 113, 113, 0.4);
+}
+
+.form-input.error:focus {
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.3);
+}
+
+.form-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.showPswrd-button {
+    margin-left: .5rem;
+    padding: .3rem .6rem;
+    transition: all 100ms;
+}
+
+.showPswrd-button:hover {
+    background-color: rgba(73, 73, 73, 0.745);
+    border-radius: 1rem;
+    cursor: pointer;
+}
+
+/* Submit Button */
+.submit-button {
+    width: 100%;
+    background: linear-gradient(to right, #4f46e5, #9333ea);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transform: scale(1);
+    transition: all 200ms;
+}
+
+.submit-button:hover {
+    transform: scale(1.02);
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+/* Loading State */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid white;
+    border-top-color: transparent;
+    border-radius: 9999px;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Divider */
+.divider {
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.divider-line {
+    flex: 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.divider-text {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Social Login Button */
+.social-button {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: background-color 200ms;
+    margin-bottom: 1rem;
+}
+
+.social-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.social-button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+/* Sign Up Link */
+.signup-text {
+    text-align: center;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.signup-link {
+    color: white;
+    font-weight: 500;
+    text-underline-offset: 2px;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}

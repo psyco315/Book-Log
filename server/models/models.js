@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-// Users Schema
+// --- Users Schema (keep unique:true on fields, remove schema.index duplicates) ---
 const userSchema = new Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
+    unique: true,     // keep this
     trim: true,
     minlength: 3,
     maxlength: 30
@@ -14,129 +14,47 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true,     // keep this
     lowercase: true
   },
-  displayName: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 100
-  },
-  avatar: {
-    type: String,
-    default: null
-  },
-  bio: {
-    type: String,
-    maxlength: 500,
-    default: ''
-  },
-  settings: {
-    privacy: {
-      profile: {
-        type: String,
-        enum: ['public', 'private', 'friends'],
-        default: 'public'
-      },
-      lists: {
-        type: String,
-        enum: ['public', 'private', 'friends'],
-        default: 'public'
-      },
-      reviews: {
-        type: String,
-        enum: ['public', 'private', 'friends'],
-        default: 'public'
-      }
-    },
-    notifications: {
-      email: { type: Boolean, default: true },
-      push: { type: Boolean, default: true }
-    }
-  },
-  stats: {
-    totalBooks: { type: Number, default: 0 },
-    booksRead: { type: Number, default: 0 },
-    reviewsCount: { type: Number, default: 0 },
-    listsCount: { type: Number, default: 0 }
-  }
+  displayName: { type: String, required: true, trim: true, maxlength: 100 },
+  avatar: { type: String, default: null },
+  bio: { type: String, maxlength: 500, default: '' },
+  settings: { /* ... */ },
+  stats: { /* ... */ }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
 
-// Indexes
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// ---- REMOVE these lines (they caused duplicate index warnings) ----
+// userSchema.index({ username: 1 });
+// userSchema.index({ email: 1 });
 
-// Books Schema - Master book database
+// --- Books Schema: remove field-level sparse and rely on schema.index(...) ---
 const bookSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  authors: [{
-    type: String,
-    required: true
-  }],
-  isbn: {
-    type: String,
-    sparse: true
-  },
-  isbn13: {
-    type: String,
-    sparse: true
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  coverImage: {
-    type: String,
-    default: null
-  },
-  publisher: {
-    type: String,
-    default: ''
-  },
-  publishedDate: {
-    type: Date,
-    default: null
-  },
-  pageCount: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  language: {
-    type: String,
-    default: 'en'
-  },
+  title: { type: String, required: true, trim: true },
+  authors: [{ type: String, required: true }],
+  isbn: { type: String },      // remove sparse here
+  isbn13: { type: String },    // remove sparse here
+  description: { type: String, default: '' },
+  coverImage: { type: String, default: null },
+  publisher: { type: String, default: '' },
+  publishedDate: { type: Date, default: null },
+  pageCount: { type: Number, min: 0, default: 0 },
+  language: { type: String, default: 'en' },
   genres: [String],
-  averageRating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0
-  },
-  ratingsCount: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
+  averageRating: { type: Number, min: 0, max: 5, default: 0 },
+  ratingsCount: { type: Number, min: 0, default: 0 },
   externalIds: {
     googleBooks: { type: String, default: null },
     goodreads: { type: String, default: null },
     openLibrary: { type: String, default: null }
   }
-}, {
-  timestamps: true
-});
+}, { timestamps: true });
 
-// Indexes
+// keep these index declarations (they're explicit, and we removed the field-level duplicates)
 bookSchema.index({ title: 'text', authors: 'text' });
 bookSchema.index({ isbn: 1 }, { sparse: true });
 bookSchema.index({ isbn13: 1 }, { sparse: true });
@@ -209,7 +127,7 @@ userBookSchema.index({ userId: 1, isFavorite: 1 });
 userBookSchema.index({ bookId: 1, status: 1 });
 
 // Virtual for progress percentage
-userBookSchema.virtual('progressPercentage').get(function() {
+userBookSchema.virtual('progressPercentage').get(function () {
   if (this.progress.totalPages > 0) {
     return Math.round((this.progress.currentPage / this.progress.totalPages) * 100);
   }
@@ -217,7 +135,7 @@ userBookSchema.virtual('progressPercentage').get(function() {
 });
 
 // Pre-save middleware to update progress percentage
-userBookSchema.pre('save', function(next) {
+userBookSchema.pre('save', function (next) {
   if (this.progress.totalPages > 0) {
     this.progress.percentage = Math.round(
       (this.progress.currentPage / this.progress.totalPages) * 100
@@ -630,36 +548,23 @@ const userBookMetadataSchema = new Schema({
 
 userBookMetadataSchema.index({ userId: 1, bookId: 1 }, { unique: true });
 
-// Create Models
-const User = mongoose.model('User', userSchema);
-const Book = mongoose.model('Book', bookSchema);
-const UserBook = mongoose.model('UserBook', userBookSchema);
-const Review = mongoose.model('Review', reviewSchema);
-const List = mongoose.model('List', listSchema);
-const Activity = mongoose.model('Activity', activitySchema);
-const Follow = mongoose.model('Follow', followSchema);
-const Comment = mongoose.model('Comment', commentSchema);
-const Like = mongoose.model('Like', likeSchema);
-const ReadingSession = mongoose.model('ReadingSession', readingSessionSchema);
-const Notification = mongoose.model('Notification', notificationSchema);
+// ---- Model creation: use guarded pattern for all models ----
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Book = mongoose.models.Book || mongoose.model('Book', bookSchema);
+const UserBook = mongoose.models.UserBook || mongoose.model('UserBook', userBookSchema);
+const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
+const List = mongoose.models.List || mongoose.model('List', listSchema);
+const Activity = mongoose.models.Activity || mongoose.model('Activity', activitySchema);
+const Follow = mongoose.models.Follow || mongoose.model('Follow', followSchema);
+const Comment = mongoose.models.Comment || mongoose.model('Comment', commentSchema);
+const Like = mongoose.models.Like || mongoose.model('Like', likeSchema);
+const ReadingSession = mongoose.models.ReadingSession || mongoose.model('ReadingSession', readingSessionSchema);
+const Notification = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);
 
-// Alternative models
-const UserStatus = mongoose.model('UserStatus', userStatusSchema);
-const UserBookMetadata = mongoose.model('UserBookMetadata', userBookMetadataSchema);
+const UserStatus = mongoose.models.UserStatus || mongoose.model('UserStatus', userStatusSchema);
+const UserBookMetadata = mongoose.models.UserBookMetadata || mongoose.model('UserBookMetadata', userBookMetadataSchema);
 
-// Export Models
 export {
-  User,
-  Book,
-  UserBook,
-  Review,
-  List,
-  Activity,
-  Follow,
-  Comment,
-  Like,
-  ReadingSession,
-  Notification,
-  UserStatus,
-  UserBookMetadata
+  User, Book, UserBook, Review, List, Activity, Follow, Comment, Like,
+  ReadingSession, Notification, UserStatus, UserBookMetadata
 };
