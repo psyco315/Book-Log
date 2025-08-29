@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/auth'
 
 const Navbar = () => {
-    const { authModal, setAuthModal } = useAuth();
+    const { authModal, setAuthModal, loggedIn, setLoggedIn } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearchChange = (e) => {
@@ -88,11 +88,18 @@ const Navbar = () => {
                         <img src={profileImg} alt="" />
                         <div>Profile</div>
                     </button>
-                    <button className='signin-btn' onClick={() => setAuthModal(true)}>
-                        <AnimatedGradientText>
-                            SignIn
-                        </AnimatedGradientText>
-                    </button>
+                    {
+                        loggedIn ?
+                            <button onClick={() => setLoggedIn(false)}>
+                                LogOut
+                            </button>
+                            :
+                            <button className='signin-btn' onClick={() => setAuthModal(true)}>
+                                <AnimatedGradientText>
+                                    SignIn
+                                </AnimatedGradientText>
+                            </button>
+                    }
                 </div>
             </div>
         </motion.div>

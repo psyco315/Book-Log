@@ -13,6 +13,10 @@
 
 .modal-backdrop>div {
     width: 100dvw;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-backdrop>div>div:nth-child(2) {

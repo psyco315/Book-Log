@@ -17,6 +17,13 @@ const userSchema = new Schema({
     unique: true,     // keep this
     lowercase: true
   },
+  password: {
+    type: String,
+    required: false,     // keep false to allow OAuth-only users; enforce at controller/signup
+    select: false,       // never returned by default from queries
+    minlength: 8,        // enforce strong-ish passwords at the controller as well
+    maxlength: 200
+  },
   displayName: { type: String, required: true, trim: true, maxlength: 100 },
   avatar: { type: String, default: null },
   bio: { type: String, maxlength: 500, default: '' },

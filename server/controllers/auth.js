@@ -19,13 +19,16 @@ export const signUp = async (req, res, User) => {
         // basic trimming / normalization
         const username = typeof rawUsername === 'string' ? rawUsername.trim() : '';
         const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
-        const displayName = typeof rawDisplayName === 'string' ? rawDisplayName.trim() : '';
+        let displayName = typeof rawDisplayName === 'string' ? rawDisplayName.trim() : '';
 
-        // Validate required fields
-        if (!username || !email || !password || !displayName) {
+        // If displayName not provided or empty, use username
+        if (!displayName) displayName = username;
+
+        // Validate required fields (displayName is now derived from username if empty)
+        if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
-                message: 'username, email, password and displayName are required'
+                message: 'username, email and password are required'
             });
         }
 
@@ -83,7 +86,6 @@ export const signUp = async (req, res, User) => {
             }
         };
 
-        // shallow-merge incoming settings with defaults, but validate enums
         const settings = { ...defaultSettings };
         if (incomingSettings && typeof incomingSettings === 'object') {
             if (incomingSettings.privacy && typeof incomingSettings.privacy === 'object') {
@@ -115,12 +117,11 @@ export const signUp = async (req, res, User) => {
         const createPayload = {
             username,
             email,
-            password: hashedPassword, // keep hashed password stored
+            password: hashedPassword,
             displayName,
             avatar,
             bio,
             settings
-            // stats will default from schema
         };
 
         const user = await User.create(createPayload);
@@ -144,7 +145,6 @@ export const signUp = async (req, res, User) => {
             return res.status(201).json({ success: true, user: userResponse, token });
         }
 
-        // If no secret, return created user without token but indicate token missing
         console.error('JWT_SECRET is not defined');
         return res.status(201).json({
             success: true,
@@ -154,9 +154,7 @@ export const signUp = async (req, res, User) => {
     } catch (err) {
         console.error('Error creating user:', err);
 
-        // Duplicate key error (index/unique)
         if (err.code === 11000) {
-            // get which field caused duplicate
             const dupField = Object.keys(err.keyValue || {})[0] || 'field';
             return res.status(409).json({
                 success: false,
@@ -164,7 +162,6 @@ export const signUp = async (req, res, User) => {
             });
         }
 
-        // Mongoose validation errors
         if (err.name === 'ValidationError') {
             const messages = Object.values(err.errors).map(e => e.message).join(', ');
             return res.status(400).json({ success: false, message: messages });
@@ -176,6 +173,7 @@ export const signUp = async (req, res, User) => {
         });
     }
 };
+
 
 
 export const signIn = async (req, res, User) => {
@@ -191,7 +189,7 @@ export const signIn = async (req, res, User) => {
         }
 
         // Find user by email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');;
         if (!user) {
             return res.status(401).json({
                 success: false,

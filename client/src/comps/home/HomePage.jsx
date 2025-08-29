@@ -4,6 +4,7 @@ import MainBody from './MainBody'
 import About from './About'
 import SignIn from '../auth.js/SignIn'
 import SignUp from '../auth.js/SignUp'
+import AuthModal from '../auth.js/AuthModal'
 import './HomePage.css'
 
 import { useAuth } from '../../context/auth'
@@ -33,16 +34,7 @@ const HomePage = () => {
       >
         <MainBody />
         <About />
-        <SignIn
-          isOpen={authModal && isSignIn}
-          onClose={handleClose}
-          onSwitchToSignUp={() => setIsSignIn(false)}
-        />
-        <SignUp
-          isOpen={authModal && !isSignIn}
-          onClose={handleClose}
-          onSwitchToSignIn={() => setIsSignIn(true)}
-        />
+        <AuthModal isOpen={authModal} signin={isSignIn} switchMode={setIsSignIn} onClose={handleClose}/>
       </motion.div>
     </div>
   )
