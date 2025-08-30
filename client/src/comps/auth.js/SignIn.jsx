@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './signin.css';
 import { WarpBackground } from "@/components/magicui/warp-background";
 import { AnimatePresence, motion } from "framer-motion";
-import api from '../api'; // ✅ import axios instance
+import { publicApi } from '../api';
 import { useAuth } from '@/context/auth';
 
 const SignIn = ({ isOpen, onClose, onSwitchToSignUp, apiUrl }) => {
-    const { loggedIn, setLoggedIn } = useAuth();
+    const { loggedIn, setLoggedIn, setCurrUser } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -72,14 +72,16 @@ const SignIn = ({ isOpen, onClose, onSwitchToSignUp, apiUrl }) => {
             };
 
             const endpoint = apiUrl || '/api/auth/signin';
-            const response = await api.post(endpoint, payload);
+            const response = await publicApi.post(endpoint, payload);
 
             const { token, user } = response.data || {};
+            // console.log(user)
 
             if (token) {
                 localStorage.setItem('authToken', token);
             }
             if (user) {
+                setCurrUser(user)
                 localStorage.setItem('user', JSON.stringify(user));
             }
 

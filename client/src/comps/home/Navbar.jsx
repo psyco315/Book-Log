@@ -10,10 +10,18 @@ import { AnimatedGradientText } from "@/components/magicui/animated-gradient-tex
 import { motion } from "motion/react"
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/auth'
+import AuthModal from '../auth.js/AuthModal'
 
 const Navbar = () => {
-    const { authModal, setAuthModal, loggedIn, setLoggedIn } = useAuth();
+    const { authModal, setAuthModal, loggedIn, setLoggedIn, setCurrUser } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
+    const [isSignIn, setIsSignIn] = useState(true);
+
+    const handleClose = () => {
+        setAuthModal(false);
+        // Reset to SignIn when modal is closed
+        setIsSignIn(true);
+    };
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -24,6 +32,17 @@ const Navbar = () => {
             console.log('Searching for:', searchQuery);
             // Implement your search logic here
         }
+    };
+
+    const handleLogout = () => {
+        // Set authentication states
+        setLoggedIn(false);
+        setAuthModal(false);
+        setCurrUser(null);
+
+        // Remove user data and token from localStorage
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
     };
 
     return (
@@ -80,17 +99,21 @@ const Navbar = () => {
                             <div>Home</div>
                         </button>
                     </Link>
-                    <button className='navBarBtn'>
-                        <img src={listImg} alt="" />
-                        <div>Library</div>
-                    </button>
-                    <button className='navBarBtn'>
-                        <img src={profileImg} alt="" />
-                        <div>Profile</div>
-                    </button>
+                    <Link to='library'>
+                        <button className='navBarBtn'>
+                            <img src={listImg} alt="" />
+                            <div>Library</div>
+                        </button>
+                    </Link>
+                    <Link to='/profile'>
+                        <button className='navBarBtn'>
+                            <img src={profileImg} alt="" />
+                            <div>Profile</div>
+                        </button>
+                    </Link>
                     {
                         loggedIn ?
-                            <button onClick={() => setLoggedIn(false)}>
+                            <button className='signin-btn' onClick={handleLogout}>
                                 LogOut
                             </button>
                             :
@@ -102,6 +125,8 @@ const Navbar = () => {
                     }
                 </div>
             </div>
+
+            <AuthModal isOpen={authModal} signin={isSignIn} switchMode={setIsSignIn} onClose={handleClose} />
         </motion.div>
     )
 }

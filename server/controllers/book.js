@@ -13,8 +13,7 @@ const fields = [
     'ratings_average',
     'readinglog_count',
     'isbn',
-    'lccn',
-    'subtitle'
+    'lccn'
 ].join(',');
 
 export const searchBooks = async (req, res) => {
@@ -24,7 +23,7 @@ export const searchBooks = async (req, res) => {
             title = '',
             author = '',
             subject = '',
-            isbn ='',
+            isbn = '',
             sort = 'readinglog',
             page = '1',
             limit = '10'
@@ -47,19 +46,19 @@ export const searchBooks = async (req, res) => {
             limit: limit
         }
 
-        if(title){
+        if (title) {
             params['title'] = title
         }
-        if(author){
+        if (author) {
             params['author'] = author
         }
-        if(subject){
+        if (subject) {
             params['subject'] = subject
         }
-        if(isbn){
+        if (isbn) {
             params['isbn'] = isbn
         }
-        if(limit){
+        if (limit) {
             params['limit'] = limit
         }
 
@@ -93,6 +92,185 @@ export const searchBooks = async (req, res) => {
     }
 };
 
+export const uploadBook = async (req, res) => {
+    try {
+        const {
+            title,
+            authors,
+            isbn,
+            lccn,
+            description,
+            coverImage,
+            publishedDate,
+            pageCount,
+            language,
+            subject,
+            averageRating,
+            ratingsCount,
+            readingLogCount,
+            externalIds
+        } = req.body;
+
+        // Validate required fields
+        if (!title || !authors || !Array.isArray(authors) || authors.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title and at least one author are required'
+            });
+        }
+
+        if (!isbn || typeof isbn !== 'string' || isbn.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'ISBN is required and must be a string'
+            });
+        }
+
+        // Check if book already exists using multiple criteria
+        // Priority: ISBN > external IDs > title + authors
+        let existingBook = null;
+
+        // First check by ISBN
+        existingBook = await Book.findOne({
+            isbn: isbn.trim()
+        });
+
+        // If not found by ISBN, check by external IDs
+        if (!existingBook && externalIds) {
+            const externalQueries = [];
+
+            if (externalIds.googleBooks) {
+                externalQueries.push({ 'externalIds.googleBooks': externalIds.googleBooks });
+            }
+            if (externalIds.goodreads) {
+                externalQueries.push({ 'externalIds.goodreads': externalIds.goodreads });
+            }
+            if (externalIds.openLibrary) {
+                externalQueries.push({ 'externalIds.openLibrary': externalIds.openLibrary });
+            }
+
+            if (externalQueries.length > 0) {
+                existingBook = await Book.findOne({
+                    $or: externalQueries
+                });
+            }
+        }
+
+        // If still not found, check by title and authors (fuzzy match)
+        if (!existingBook) {
+            // Normalize title and authors for comparison
+            const normalizedTitle = title.toLowerCase().trim();
+            const normalizedAuthors = authors.map(author => author.toLowerCase().trim());
+
+            existingBook = await Book.findOne({
+                $and: [
+                    { title: { $regex: new RegExp(`^${normalizedTitle}$`, 'i') } },
+                    { authors: { $in: normalizedAuthors } }
+                ]
+            });
+        }
+
+        // If book already exists, return the existing book
+        if (existingBook) {
+            return res.status(200).json({
+                success: true,
+                message: 'Book already exists',
+                book: existingBook,
+                created: false
+            });
+        }
+
+        // Prepare book data for creation
+        const bookData = {
+            title: title.trim(),
+            authors: authors.map(author => author.trim()),
+            isbn: isbn.trim(),
+            description: description || 'Description not available'
+        };
+
+        // Add optional fields if provided
+        if (lccn && Array.isArray(lccn)) {
+            bookData.lccn = lccn.filter(id => id && id.trim());
+        }
+
+        if (coverImage) bookData.coverImage = coverImage;
+
+        if (publishedDate) {
+            // Handle various date formats
+            const parsedDate = new Date(publishedDate);
+            if (!isNaN(parsedDate.getTime())) {
+                bookData.publishedDate = parsedDate;
+            }
+        }
+
+        if (pageCount !== undefined && pageCount >= 0) {
+            bookData.pageCount = parseInt(pageCount);
+        }
+
+        if (language && Array.isArray(language)) {
+            bookData.language = language.filter(lang => lang && lang.trim());
+        }
+
+        if (subject && Array.isArray(subject)) {
+            bookData.subject = subject.filter(subj => subj && subj.trim());
+        }
+
+        if (averageRating !== undefined && averageRating >= 0 && averageRating <= 5) {
+            bookData.averageRating = parseFloat(averageRating);
+        }
+
+        if (ratingsCount !== undefined && ratingsCount >= 0) {
+            bookData.ratingsCount = parseInt(ratingsCount);
+        }
+
+        if (readingLogCount !== undefined && readingLogCount >= 0) {
+            bookData.readingLogCount = parseInt(readingLogCount);
+        }
+
+        if (externalIds) {
+            bookData.externalIds = {};
+            if (externalIds.googleBooks) bookData.externalIds.googleBooks = externalIds.googleBooks;
+            if (externalIds.goodreads) bookData.externalIds.goodreads = externalIds.goodreads;
+            if (externalIds.openLibrary) bookData.externalIds.openLibrary = externalIds.openLibrary;
+        }
+
+        // Create new book
+        const newBook = new Book(bookData);
+        await newBook.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Book created successfully',
+            book: newBook,
+            created: true
+        });
+
+    } catch (error) {
+        console.error('Error uploading book:', error);
+
+        // Handle validation errors
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Validation error',
+                errors: Object.values(error.errors).map(err => err.message)
+            });
+        }
+
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: 'Book with this identifier already exists'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
 
 const AUTHOR_SEARCH_URL = 'https://openlibrary.org/search/authors.json';
 const AUTHOR_URL = 'https://openlibrary.org/authors';

@@ -7,9 +7,11 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [authModal, setAuthModal] = useState(false); // Sign-in modal state
   const [loggedIn, setLoggedIn] = useState(false);   // Auth state
+  const [currUser, setCurrUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
 
   return (
-    <AuthContext.Provider value={{ authModal, setAuthModal, loggedIn, setLoggedIn }}>
+    <AuthContext.Provider value={{ authModal, setAuthModal, loggedIn, setLoggedIn, currUser, setCurrUser, token, setToken }}>
       {children}
     </AuthContext.Provider>
   );

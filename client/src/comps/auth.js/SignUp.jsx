@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WarpBackground } from '@/components/magicui/warp-background';
-import api from '../api';
+import { publicApi } from '../api';
 import { useAuth } from '@/context/auth';
 import './signup.css';
 
 const SignUp = ({ isOpen, onClose, onSwitchToSignIn, apiUrl }) => {
-    const { loggedIn, setLoggedIn } = useAuth();
+    const { loggedIn, setLoggedIn, setCurrUser } = useAuth();
     const initialFormState = {
         username: '',
         email: '',
@@ -102,7 +102,7 @@ const SignUp = ({ isOpen, onClose, onSwitchToSignIn, apiUrl }) => {
             const endpoint = apiUrl || '/api/auth/signup';
 
             // If apiUrl is a full URL, axios will use it; otherwise axios instance baseURL is used
-            const response = await api.post(endpoint, payload);
+            const response = await publicApi.post(endpoint, payload);
 
             // On success, backend usually returns token + user
             const { token, user } = response.data || {};
@@ -113,6 +113,7 @@ const SignUp = ({ isOpen, onClose, onSwitchToSignIn, apiUrl }) => {
 
             // Optionally save user snapshot
             if (user) {
+                setCurrUser(user)
                 localStorage.setItem('user', JSON.stringify(user));
             }
 

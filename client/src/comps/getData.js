@@ -1,4 +1,4 @@
-import api from "./api";
+import { publicApi } from './api';
 import axios from 'axios'
 
 export const fetchBooks = async ({ q = "", author = "", title = "", subject = "", isbn = "", limit = 10 }) => {
@@ -20,7 +20,7 @@ export const fetchBooks = async ({ q = "", author = "", title = "", subject = ""
 
         const url = `/api/book/search?${params.toString()}`;
 
-        const { data } = await api.get(url);
+        const { data } = await publicApi.get(url);
         return data;
     } catch (err) {
         console.error(`Error fetching "${title}":`, err.message);

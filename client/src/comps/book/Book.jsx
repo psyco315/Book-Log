@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '../home/Navbar'
-import SignIn from '../auth.js/SignIn';
-import SignUp from '../auth.js/SignUp';
 import { useParams } from "react-router-dom";
 import { motion } from 'motion/react'
 import { fetchBooks, getDesc } from '../getData';
 import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
-import { useAuth } from '@/context/auth';
 import Lottie from 'react-lottie-player'
 import './book.css'
 
@@ -19,21 +16,12 @@ import star2 from '../../assets/star2.png'
 import status from '../../assets/status.webp'
 import loadingCover from '../../assets/loadCover.png'
 import loadingAnimation from '../../assets/loading_gray.json'
-import { title } from 'process';
 
 const Book = () => {
     const { isbn } = useParams();   // 👈 get isbn from URL
     const [book, setBook] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
     const [screenWidth, setScreenWidth] = useState(0);
-    const { authModal, setAuthModal } = useAuth();
-    const [isSignIn, setIsSignIn] = useState(true);
-
-    const handleClose = () => {
-        setAuthModal(false);
-        // Reset to SignIn when modal is closed
-        setIsSignIn(true);
-    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -314,17 +302,6 @@ const Book = () => {
                     </div>
                 </div>
             </motion.div>
-
-            <SignIn
-                isOpen={authModal && isSignIn}
-                onClose={handleClose}
-                onSwitchToSignUp={() => setIsSignIn(false)}
-            />
-            <SignUp
-                isOpen={authModal && !isSignIn}
-                onClose={handleClose}
-                onSwitchToSignIn={() => setIsSignIn(true)}
-            />
         </div>
     )
 }

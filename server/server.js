@@ -5,9 +5,10 @@ import bodyParser from 'body-parser';
 dotenv.config();
 
 import connectDB from './database/connect.js';
-// import userRoutes from './routes/user.js';
+import userRoutes from './routes/user.js';
 import bookRoutes from './routes/book.js';
 import authRoutes from './routes/auth.js'
+import userDataRoutes from './routes/userData.js'
 
 
 const app = express();
@@ -41,6 +42,7 @@ app.get('/api/test', (req, res) => {
 // app.use('/api/user', userRoutes);
 app.use('/api/book', bookRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

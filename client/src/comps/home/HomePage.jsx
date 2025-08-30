@@ -2,24 +2,12 @@ import React, { useState } from 'react'
 import Navbar from './Navbar'
 import MainBody from './MainBody'
 import About from './About'
-import SignIn from '../auth.js/SignIn'
-import SignUp from '../auth.js/SignUp'
-import AuthModal from '../auth.js/AuthModal'
 import './HomePage.css'
-
-import { useAuth } from '../../context/auth'
 
 import { motion } from 'motion/react'
 
 const HomePage = () => {
-  const { authModal, setAuthModal } = useAuth();
-  const [isSignIn, setIsSignIn] = useState(true);
-
-  const handleClose = () => {
-    setAuthModal(false);
-    // Reset to SignIn when modal is closed
-    setIsSignIn(true);
-  };
+  
 
   return (
     <div className='homePage relative hover:cursor-default min-h-screen text-white/80 flex flex-col items-center'>
@@ -34,7 +22,7 @@ const HomePage = () => {
       >
         <MainBody />
         <About />
-        <AuthModal isOpen={authModal} signin={isSignIn} switchMode={setIsSignIn} onClose={handleClose}/>
+        
       </motion.div>
     </div>
   )

@@ -43,17 +43,23 @@ const userSchema = new Schema({
 const bookSchema = new Schema({
   title: { type: String, required: true, trim: true },
   authors: [{ type: String, required: true }],
-  isbn: { type: String },      // remove sparse here
-  isbn13: { type: String },    // remove sparse here
-  description: { type: String, default: '' },
+  isbn: { type: String, required: true, trim: true },
+  lccn: {
+    type: [String],
+    default: []
+  },
+  description: { type: String, default: 'Description not available' },
   coverImage: { type: String, default: null },
-  publisher: { type: String, default: '' },
   publishedDate: { type: Date, default: null },
   pageCount: { type: Number, min: 0, default: 0 },
-  language: { type: String, default: 'en' },
-  genres: [String],
+  language: {
+    type: [String],
+    default: []
+  },
+  subject: [String],
   averageRating: { type: Number, min: 0, max: 5, default: 0 },
   ratingsCount: { type: Number, min: 0, default: 0 },
+  readingLogCount: { type: Number, min: 0, default: 0 },
   externalIds: {
     googleBooks: { type: String, default: null },
     goodreads: { type: String, default: null },
@@ -64,8 +70,7 @@ const bookSchema = new Schema({
 // keep these index declarations (they're explicit, and we removed the field-level duplicates)
 bookSchema.index({ title: 'text', authors: 'text' });
 bookSchema.index({ isbn: 1 }, { sparse: true });
-bookSchema.index({ isbn13: 1 }, { sparse: true });
-bookSchema.index({ genres: 1 });
+bookSchema.index({ subject: 1 });
 
 // User Book Status Schema - Individual Document Approach (Recommended)
 const userBookSchema = new Schema({
@@ -81,7 +86,7 @@ const userBookSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['read', 'reading', 'plan-to-read', 'dnf'],
+    enum: ['read', 'reading', 'plan-to-read', 'undefined'],
     required: true
   },
   isFavorite: {
@@ -238,11 +243,6 @@ const listSchema = new Schema({
     type: String,
     enum: ['public', 'private', 'friends'],
     default: 'public'
-  },
-  type: {
-    type: String,
-    enum: ['custom', 'favorites', 'currently-reading', 'to-read', 'read'],
-    default: 'custom'
   },
   tags: [String],
   books: [{

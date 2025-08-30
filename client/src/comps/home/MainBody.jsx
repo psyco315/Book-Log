@@ -11,11 +11,11 @@ const MainBody = () => {
             try {
                 const data = await fetchBooks({ subject: "fiction" });
                 if (data) {
-                    console.log(data.data.books)
+                    // console.log(data.data.books)
                     setTempData(data.data.books); // update state
                 }
             } catch (err) {
-                console.error("Failed to fetch books:", err);
+                // console.error("Failed to fetch books:", err);
             }
         };
 
