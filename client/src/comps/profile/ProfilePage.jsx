@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { securedApi } from '../api';
 
 import Navbar from '../home/Navbar';
-import './ProfilePage.css';
+import './profilepage.css';
 
 const ProfilePage = () => {
     const { currUser, loggedIn } = useAuth();
