@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios';
 import Navbar from '../home/Navbar'
+import StatusModal from './StatusModal' // Import the modal
 import { useParams } from "react-router-dom";
 import { motion } from 'motion/react'
 import { fetchBooks, getDesc } from '../getData';
 import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
+import publicApi from '../api';
 import Lottie from 'react-lottie-player'
 import './book.css'
 
@@ -18,10 +21,11 @@ import loadingCover from '../../assets/loadCover.png'
 import loadingAnimation from '../../assets/loading_gray.json'
 
 const Book = () => {
-    const { isbn } = useParams();   // 👈 get isbn from URL
+    const { isbn } = useParams();
     const [book, setBook] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
     const [screenWidth, setScreenWidth] = useState(0);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false); // Modal state
 
     useEffect(() => {
         const handleResize = () => {
@@ -30,9 +34,7 @@ const Book = () => {
             setIsMobile(width < 991);
         };
 
-        // Set initial values
         handleResize();
-
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
@@ -41,77 +43,69 @@ const Book = () => {
         if (!Array.isArray(subjects)) return [];
 
         const result = subjects
-            .flatMap(item => item.split(","))   // split comma-separated values
-            .map(s => s.trim())                 // remove extra spaces
-            .filter(s => s.length > 0)          // remove empties
-            .map(s => s.charAt(0).toUpperCase() + s.slice(1)) // normalize case
-            .filter((s, i, arr) => arr.indexOf(s) === i); // remove duplicates
+            .flatMap(item => item.split(","))
+            .map(s => s.trim())
+            .filter(s => s.length > 0)
+            .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+            .filter((s, i, arr) => arr.indexOf(s) === i);
 
         return result;
     };
 
-    useEffect(() => {
-        const loadBookAndDescription = async () => {
-            if (!isbn) return;
+    const loadBookAndDescription = async () => {
+        if (!isbn) return;
 
-            try {
-                // First, load the book
-                const bookData = await fetchBooks({ isbn: isbn });
-                if (bookData?.data) {
-                    const finalData = bookData.data.books[0];
-                    finalData.subject = cleanSubjects(finalData.subject);
+        try {
+            const bookData = await fetchBooks({ isbn: isbn });
+            if (bookData?.data) {
+                const finalData = bookData.data.books[0];
+                finalData.subject = cleanSubjects(finalData.subject);
 
-                    // Round ratings_average to 1 decimal place
-                    if (finalData.ratings_average) {
-                        finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
-                    }
-
-                    // console.log(finalData)
-                    setBook(finalData);
-
-                    // Then load description using the book data we just got
-                    try {
-                        const descData = await getDesc(finalData.title, finalData.author_name);
-                        if (descData) {
-                            setBook(prev => ({
-                                ...prev,
-                                description: typeof descData.description === "string"
-                                    ? descData.description
-                                    : descData.description?.value || "No description available",
-                            }));
-                        }
-                    } catch (err) {
-                        console.error("Failed to fetch description:", err);
-                    }
+                if (finalData.ratings_average) {
+                    finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
                 }
-            } catch (err) {
-                console.error("Failed to fetch book:", err);
-            }
-        };
 
-        loadBookAndDescription();
-    }, [isbn]);
+                setBook(finalData);
+
+                try {
+                    const descData = await getDesc(finalData.title, finalData.author_name);
+                    if (descData) {
+                        setBook(prev => ({
+                            ...prev,
+                            description: typeof descData.description === "string"
+                                ? descData.description
+                                : descData.description?.value || "No description available",
+                        }));
+
+
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch description:", err);
+                }
+            }
+        } catch (err) {
+            console.error("Failed to fetch book:", err);
+        }
+    };
+
+
 
     const [imgLink, setImgLink] = useState(defCover);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadCover = async () => {
         try {
-            // console.log('Finding img with API')
             let coverUrl = await imgFunc1(book.title, book.author_name);
 
             if (!coverUrl) {
-                // console.log('Finding img with lccn')
                 coverUrl = await imgFunc2(book.lccn, book.title);
             }
 
             if (!coverUrl) {
-                // console.log('Finding img with isbn')
                 coverUrl = await imgFunc3(book.isbn, book.title);
             }
 
             if (coverUrl) {
-                // console.log("Final:", title, "-", coverUrl)
                 setImgLink(coverUrl);
             }
 
@@ -123,10 +117,187 @@ const Book = () => {
         }
     };
 
+    const addBookToDb = async (bookData) => {
+        try {
+            // Send POST request to the API
+            const response = await publicApi.post('/api/book/db', bookData);
+
+            // Return successful response
+            console.log("very fine")
+            return {
+                success: true,
+                data: response.data,
+                message: response.data.message || 'Book added successfully'
+            };
+
+        } catch (error) {
+            console.error('Error adding book to database:', error);
+
+            // Handle different error types
+            if (error.response) {
+                // Server responded with error status
+                return {
+                    success: false,
+                    message: error.response.data.message || 'Server error occurred',
+                    status: error.response.status,
+                    data: error.response.data
+                };
+            } else if (error.request) {
+                // Request was made but no response received
+                return {
+                    success: false,
+                    message: 'No response from server. Please check your connection.',
+                    error: 'NETWORK_ERROR'
+                };
+            } else {
+                // Something else happened
+                return {
+                    success: false,
+                    message: 'An unexpected error occurred',
+                    error: error.message
+                };
+            }
+        }
+    };
+
+    const createBookData = (book, imgLink) => {
+        const bookData = {
+            title: book?.title,
+            author_name: book?.author_name || [],
+            isbn: Array.isArray(book?.isbn) ? book.isbn[0] : book?.isbn,
+            lccn: book?.lccn || [],
+            description: book?.description || "No description available",
+            coverImage: imgLink,
+            first_publish_year: book?.first_publish_year,
+            number_of_pages_median: book?.number_of_pages_median || book?.number_of_pages,
+            language: book?.language || [],
+            subject: book?.subject || [],
+            ratings_average: book?.ratings_average ? parseFloat(book.ratings_average) : null,
+            readinglog_count: book?.readinglog_count || 0,
+            externalIds: {
+                googleBooks: book?.google_books_id || null,
+                goodreads: book?.goodreads_id || null,
+                openLibrary: book?.key || book?.olid?.[0] || null
+            }
+        };
+
+        // Clean up null/undefined values
+        Object.keys(bookData).forEach(key => {
+            if (bookData[key] === null || bookData[key] === undefined ||
+                (Array.isArray(bookData[key]) && bookData[key].length === 0)) {
+                delete bookData[key];
+            }
+        });
+
+        // Clean up externalIds
+        if (bookData.externalIds) {
+            Object.keys(bookData.externalIds).forEach(key => {
+                if (bookData.externalIds[key] === null || bookData.externalIds[key] === undefined) {
+                    delete bookData.externalIds[key];
+                }
+            });
+
+            if (Object.keys(bookData.externalIds).length === 0) {
+                delete bookData.externalIds;
+            }
+        }
+
+        return bookData;
+    };
+
+    const updateBookCoverImage = async (isbn, imgLink) => {
+        try {
+            // Prepare data for update
+            const updateData = {
+                isbn: isbn,
+                coverImage: imgLink
+            };
+
+            // Send PUT/PATCH request to update cover image
+            const response = await publicApi.patch(
+                '/api/book/update-cover',
+                updateData
+            );
+
+            return {
+                success: true,
+                data: response.data,
+                message: response.data.message || 'Cover image updated successfully'
+            };
+
+        } catch (error) {
+            console.error('Error updating cover image:', error);
+
+            if (error.response) {
+                return {
+                    success: false,
+                    message: error.response.data.message || 'Server error occurred',
+                    status: error.response.status,
+                    data: error.response.data
+                };
+            } else if (error.request) {
+                return {
+                    success: false,
+                    message: 'No response from server. Please check your connection.',
+                    error: 'NETWORK_ERROR'
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'An unexpected error occurred',
+                    error: error.message
+                };
+            }
+        }
+    };
+
     useEffect(() => {
-        // console.log("Book changed:", book)
-        loadCover();
+        loadBookAndDescription();
+    }, [isbn]);
+
+    useEffect(() => {
+        if (book) {
+            loadCover();
+        }
     }, [book]);
+
+    useEffect(() => {
+        if (imgLink !== '/src/assets/defCover.png' && book.description) {
+            const uploadData = createBookData(book, imgLink)
+            console.log(uploadData)
+            addBookToDb(uploadData)
+        }
+    }, [imgLink, book])
+
+
+    // Handle status update
+    const handleStatusUpdate = async (statusData, isbn) => {
+        try {
+            const token = localStorage.getItem('authToken'); // Adjust based on how you store auth token
+            console.log(isbn)
+
+            const response = await fetch(`http://localhost:3000/api/userdata/${isbn}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(statusData)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                console.log('Status updated successfully:', result);
+                // You can add success notification here
+            } else {
+                throw new Error(result.message || 'Failed to update status');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error);
+            throw error; // Re-throw to let modal handle the error
+        }
+    };
 
     if (!book) return <p>Loading...</p>;
 
@@ -135,40 +306,29 @@ const Book = () => {
             <Navbar />
 
             <motion.div className='contentParent'
-                initial={{
-                    opacity: 0
-                }}
-                animate={{
-                    opacity: 1
-                }}
-                transition={{
-                    duration: 0.6,
-                    ease: "easeOut"
-                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
             >
                 <div className='photoCol'>
-                    {/* <img src={defCover} alt="" /> */}
-
-                    {
-                        isLoading ?
-                            <div
-                                className="loadCover flex items-center justify-center bg-cover bg-center"
-                                style={{ backgroundImage: `url(${loadingCover})` }}
-                            >
-                                <Lottie
-                                    loop
-                                    animationData={loadingAnimation}
-                                    play
-                                    className='loadAni'
-                                />
-                            </div>
-
-                            :
-                            <motion.img
-                                src={imgLink}
-                                alt={book.title}
+                    {isLoading ? (
+                        <div
+                            className="loadCover flex items-center justify-center bg-cover bg-center"
+                            style={{ backgroundImage: `url(${loadingCover})` }}
+                        >
+                            <Lottie
+                                loop
+                                animationData={loadingAnimation}
+                                play
+                                className='loadAni'
                             />
-                    }
+                        </div>
+                    ) : (
+                        <motion.img
+                            src={imgLink}
+                            alt={book.title}
+                        />
+                    )}
 
                     <div className='altDesc'>
                         <div className={`title ${isMobile ? '' : 'hidden'}`}>
@@ -189,8 +349,6 @@ const Book = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* -------------------------------------------------------------------------------------------------------------------- */}
 
                 <div className='descCol'>
                     <div className={`title ${isMobile ? 'hidden' : ''}`}>
@@ -228,36 +386,27 @@ const Book = () => {
                             ))}
                         </div>
                     </div>
-                    {/* 
-                    <div className='comments'>
-                        comments
-                    </div> */}
                 </div>
-
-                {/* -------------------------------------------------------------------------------------------------------------------- */}
 
                 <div className='rateCol'>
                     <div className='userBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
                         <div className='logBtnList flex justify-around'>
-                            <button className='logBtn'>
+                            <button
+                                className='logBtn'
+                                onClick={() => setIsStatusModalOpen(true)} // Open modal
+                            >
                                 <img src={status} alt="" />
-                                <div>
-                                    Status
-                                </div>
+                                <div>Status</div>
                             </button>
 
                             <button className='logBtn'>
                                 <img src={heart1} alt="" />
-                                <div>
-                                    Favourite?
-                                </div>
+                                <div>Favourite?</div>
                             </button>
 
                             <button className='logBtn'>
                                 <img src={readList} alt="" />
-                                <div>
-                                    Add to List
-                                </div>
+                                <div>Add to List</div>
                             </button>
                         </div>
 
@@ -269,10 +418,7 @@ const Book = () => {
                                 <img src={star} alt="" />
                                 <img src={star} alt="" />
                             </div>
-
-                            <button>
-                                Rate
-                            </button>
+                            <button>Rate</button>
                         </div>
 
                         <div className='postRev'>
@@ -282,18 +428,14 @@ const Book = () => {
 
                     <div className='ratingBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
                         <div>
-                            <div>
-                                Average Rating
-                            </div>
+                            <div>Average Rating</div>
                             <div className='flex justify-center items-center'>
                                 <img src={star2} alt="" />
                                 <div>{book.ratings_average}</div>
                             </div>
                         </div>
                         <div>
-                            <div>
-                                BookStop Rating
-                            </div>
+                            <div>BookStop Rating</div>
                             <div className='flex justify-center items-center'>
                                 <img src={star2} alt="" />
                                 <div>{book.ratings_average}</div>
@@ -302,6 +444,14 @@ const Book = () => {
                     </div>
                 </div>
             </motion.div>
+
+            {/* Status Modal */}
+            <StatusModal
+                isOpen={isStatusModalOpen}
+                onClose={() => setIsStatusModalOpen(false)}
+                book={book}
+                onStatusUpdate={handleStatusUpdate}
+            />
         </div>
     )
 }

@@ -43,6 +43,7 @@ app.get('/api/test', (req, res) => {
 app.use('/api/book', bookRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/userdata', userDataRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

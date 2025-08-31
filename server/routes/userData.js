@@ -6,16 +6,16 @@ const router = express.Router();
 
 // Change/update book status for authenticated user
 // POST/PUT /api/books/:bookId/status
-router.put('/:bookId/status', verifyToken, changeStatus);
-router.post('/:bookId/status', verifyToken, changeStatus);
+router.put('/:isbn/status', verifyToken, changeStatus);
+router.post('/:isbn/status', verifyToken, changeStatus);
 
 // Get specific book status for authenticated user  
 // GET /api/books/:bookId/status
-router.get('/:bookId/status', verifyToken, getBookStatus);
+router.get('/:isbn/status', verifyToken, getBookStatus);
 
 // Get all books for a user
 // GET /api/user/:userId/books
-router.get('/user/:userId/books', verifyToken, getUserBooks);
+router.get('/user/:isbn/books', verifyToken, getUserBooks);
 
 // Get all books for authenticated user
 // GET /api/user/books

@@ -92,27 +92,26 @@ export const searchBooks = async (req, res) => {
     }
 };
 
-export const uploadBook = async (req, res) => {
+export const uploadBook = async (req, res, Book) => {
     try {
         const {
             title,
-            authors,
+            author_name,
             isbn,
             lccn,
             description,
             coverImage,
-            publishedDate,
-            pageCount,
+            first_publish_year,
+            number_of_pages_median,
             language,
             subject,
-            averageRating,
-            ratingsCount,
-            readingLogCount,
+            ratings_average,
+            readinglog_count,
             externalIds
         } = req.body;
 
         // Validate required fields
-        if (!title || !authors || !Array.isArray(authors) || authors.length === 0) {
+        if (!title || !author_name || !Array.isArray(author_name) || author_name.length === 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Title and at least one author are required'
@@ -160,7 +159,7 @@ export const uploadBook = async (req, res) => {
         if (!existingBook) {
             // Normalize title and authors for comparison
             const normalizedTitle = title.toLowerCase().trim();
-            const normalizedAuthors = authors.map(author => author.toLowerCase().trim());
+            const normalizedAuthors = author_name.map(author => author.toLowerCase().trim());
 
             existingBook = await Book.findOne({
                 $and: [
@@ -183,7 +182,7 @@ export const uploadBook = async (req, res) => {
         // Prepare book data for creation
         const bookData = {
             title: title.trim(),
-            authors: authors.map(author => author.trim()),
+            authors: author_name.map(author => author.trim()),
             isbn: isbn.trim(),
             description: description || 'Description not available'
         };
@@ -195,36 +194,28 @@ export const uploadBook = async (req, res) => {
 
         if (coverImage) bookData.coverImage = coverImage;
 
-        if (publishedDate) {
-            // Handle various date formats
-            const parsedDate = new Date(publishedDate);
-            if (!isNaN(parsedDate.getTime())) {
-                bookData.publishedDate = parsedDate;
-            }
+        if (first_publish_year) {
+            bookData.publishedDate = first_publish_year;
         }
 
-        if (pageCount !== undefined && pageCount >= 0) {
-            bookData.pageCount = parseInt(pageCount);
+        if (number_of_pages_median !== undefined && number_of_pages_median >= 0) {
+            bookData.pageCount = parseInt(number_of_pages_median);
         }
 
         if (language && Array.isArray(language)) {
-            bookData.language = language.filter(lang => lang && lang.trim());
+            bookData.lang = language.filter(lang => lang && lang.trim());
         }
 
         if (subject && Array.isArray(subject)) {
             bookData.subject = subject.filter(subj => subj && subj.trim());
         }
 
-        if (averageRating !== undefined && averageRating >= 0 && averageRating <= 5) {
-            bookData.averageRating = parseFloat(averageRating);
+        if (ratings_average !== undefined && ratings_average >= 0 && ratings_average <= 5) {
+            bookData.averageRating = parseFloat(ratings_average);
         }
 
-        if (ratingsCount !== undefined && ratingsCount >= 0) {
-            bookData.ratingsCount = parseInt(ratingsCount);
-        }
-
-        if (readingLogCount !== undefined && readingLogCount >= 0) {
-            bookData.readingLogCount = parseInt(readingLogCount);
+        if (readinglog_count !== undefined && readinglog_count >= 0) {
+            bookData.readingLogCount = parseInt(readinglog_count);
         }
 
         if (externalIds) {
@@ -262,6 +253,65 @@ export const uploadBook = async (req, res) => {
             return res.status(409).json({
                 success: false,
                 message: 'Book with this identifier already exists'
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+};
+
+export const getBook = async (req, res, Book) => {
+    try {
+        const { isbn } = req.params;
+        console.log(isbn)
+
+        // Validate ISBN parameter
+        if (!isbn || typeof isbn !== 'string' || isbn.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'ISBN parameter is required and must be a valid string'
+            });
+        }
+
+        // Clean and normalize ISBN (remove spaces, hyphens)
+        const normalizedIsbn = isbn.trim().replace(/[-\s]/g, '');
+
+        // Search for book by ISBN
+        const book = await Book.findOne({
+            $or: [
+                { isbn: isbn.trim() },
+                { isbn: normalizedIsbn },
+                { isbn: { $regex: new RegExp(`^${normalizedIsbn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }
+            ]
+        });
+
+        // If book not found
+        if (!book) {
+            return res.status(404).json({
+                success: false,
+                message: 'Book not found with the provided ISBN',
+                isbn: isbn
+            });
+        }
+
+        // Return found book
+        res.status(200).json({
+            success: true,
+            message: 'Book found successfully',
+            book: book
+        });
+
+    } catch (error) {
+        console.error('Error retrieving book:', error);
+
+        // Handle invalid ObjectId format (if using MongoDB ObjectId)
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid ISBN format'
             });
         }
 

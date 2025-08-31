@@ -2,15 +2,14 @@ import { UserBook, Book } from '../models/models.js';
 
 export const changeStatus = async (req, res) => {
     try {
-        const { bookId } = req.params;
-        const { status, isFavorite, rating, notes, tags, currentPage, totalPages } = req.body;
-        const userId = req.user.id; // Assuming you have middleware that sets req.user
+        const { isbn } = req.params;
+        const { userId, status, isFavorite, rating, notes, tags, currentPage, totalPages } = req.body;
 
         // Validate required fields
-        if (!bookId || !status) {
+        if (!isbn || !status) {
             return res.status(400).json({
                 success: false,
-                message: 'Book ID and status are required'
+                message: 'ISBN and status are required'
             });
         }
 
@@ -31,14 +30,27 @@ export const changeStatus = async (req, res) => {
             });
         }
 
-        // Check if book exists
-        const bookExists = await Book.findById(bookId);
-        if (!bookExists) {
+        // Clean and normalize ISBN
+        const normalizedIsbn = isbn.trim()
+
+        // Find book by ISBN
+        const book = await Book.findOne({
+            $or: [
+                { isbn: isbn.trim() },
+                { isbn: normalizedIsbn }
+            ]
+        });
+
+        if (!book) {
             return res.status(404).json({
                 success: false,
-                message: 'Book not found'
+                message: 'Book not found with the provided ISBN',
+                isbn: isbn
             });
         }
+
+        // Use the found book's ID
+        const bookId = book._id;
 
         // Prepare update data
         const updateData = {
@@ -107,7 +119,12 @@ export const changeStatus = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Book status updated successfully',
-            userBook: userBook
+            userBook: userBook,
+            book: {
+                isbn: book.isbn,
+                title: book.title,
+                authors: book.authors
+            }
         });
 
     } catch (error) {

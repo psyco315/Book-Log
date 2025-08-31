@@ -50,15 +50,14 @@ const bookSchema = new Schema({
   },
   description: { type: String, default: 'Description not available' },
   coverImage: { type: String, default: null },
-  publishedDate: { type: Date, default: null },
+  publishedDate: { type: Number, default: null },
   pageCount: { type: Number, min: 0, default: 0 },
-  language: {
+  lang: {
     type: [String],
     default: []
   },
   subject: [String],
   averageRating: { type: Number, min: 0, max: 5, default: 0 },
-  ratingsCount: { type: Number, min: 0, default: 0 },
   readingLogCount: { type: Number, min: 0, default: 0 },
   externalIds: {
     googleBooks: { type: String, default: null },
