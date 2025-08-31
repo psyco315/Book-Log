@@ -264,16 +264,12 @@ const Book = () => {
             const token = localStorage.getItem('authToken'); // Adjust based on how you store auth token
             // console.log(isbn)
 
-            const response = await fetch(`http://localhost:3000/api/userdata/${isbn}/status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(statusData)
-            });
+            const response = await securedApi.post(
+                `/api/userdata/${isbn}/status`,
+                statusData
+            );
 
-            const result = await response.json();
+            const result = response.data;
 
             if (result.success) {
                 console.log('Status updated successfully:', result);
