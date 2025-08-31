@@ -68,6 +68,7 @@ const Book = () => {
             if (bookData?.data) {
                 const finalData = bookData.data.books[0];
                 finalData.subject = cleanSubjects(finalData.subject);
+                finalData.description = ''
 
                 if (finalData.ratings_average) {
                     finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
