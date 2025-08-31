@@ -158,18 +158,38 @@ export const changeStatus = async (req, res) => {
 export const getBookStatus = async (req, res) => {
     try {
         const { bookId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user.userId
 
-        const userBook = await UserBook.findOne({ userId, bookId })
-            .populate('bookId', 'title authors coverImage');
+        // console.log('Extracted bookId:', bookId);
+        // console.log('Extracted userId:', userId);
 
-        if (!userBook) {
-            return res.status(404).json({
+        if (!userId) {
+            return res.status(401).json({
                 success: false,
-                message: 'Book not found in user library'
+                message: 'User not authenticated'
             });
         }
 
+        if (!bookId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Book ID is required'
+            });
+        }
+
+        const userBook = await UserBook.findOne({ userId, bookId })
+            .populate('bookId', 'title author_name coverImage');
+
+
+        if (!userBook) {
+            return res.status(200).json({
+                success: false,
+                message: 'No status found for this book',
+                userBook: null
+            });
+        }
+
+        // console.log('Found userBook:', userBook);
         res.status(200).json({
             success: true,
             userBook: userBook
@@ -179,7 +199,8 @@ export const getBookStatus = async (req, res) => {
         console.error('Error fetching book status:', error);
         res.status(500).json({
             success: false,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            error: error.message
         });
     }
 };

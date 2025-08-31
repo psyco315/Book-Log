@@ -222,6 +222,14 @@ export const signIn = async (req, res, User) => {
             { expiresIn: '24h' }
         );
 
+        // // Debug the token
+        // const decoded = jwt.decode(token);
+        // const currentTime = Math.floor(Date.now() / 1000);
+        // console.log('Token created at (iat):', decoded.iat, new Date(decoded.iat * 1000));
+        // console.log('Token expires at (exp):', decoded.exp, new Date(decoded.exp * 1000));
+        // console.log('Current time:', currentTime, new Date(currentTime * 1000));
+        // console.log('Time until expiration (seconds):', decoded.exp - currentTime);
+
         res.status(200).json({
             success: true,
             user: {

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/auth';
 import './book.css';
 import './statusmodal.css'
 
-const StatusModal = ({ isOpen, onClose, book, onStatusUpdate }) => {
+const StatusModal = ({ isOpen, onClose, book, currentStatus, onStatusUpdate }) => {
+    const { currUser } = useAuth()
     const [formData, setFormData] = useState({
         status: 'undefined',
         notes: '',
@@ -17,11 +19,11 @@ const StatusModal = ({ isOpen, onClose, book, onStatusUpdate }) => {
     useEffect(() => {
         if (isOpen && book) {
             setFormData({
-                status: 'undefined',
-                notes: '',
-                tags: [],
-                currentPage: '',
-                totalPages: book?.number_of_pages_median || ''
+                status: currentStatus?.status || 'undefined',
+                notes: currentStatus?.notes || '',
+                tags: currentStatus?.tags || [],
+                currentPage: currentStatus?.progress.currentPage || '',
+                totalPages: currentStatus?.progress.totalPages || book?.number_of_pages_median || ''
             });
         }
     }, [isOpen, book]);
@@ -56,7 +58,9 @@ const StatusModal = ({ isOpen, onClose, book, onStatusUpdate }) => {
         setIsSubmitting(true);
 
         try {
+            console.log(currUser)
             const payload = {
+                userId: currUser.id,
                 status: formData.status,
                 notes: formData.notes || undefined,
                 tags: formData.tags.length > 0 ? formData.tags : undefined,
@@ -69,7 +73,7 @@ const StatusModal = ({ isOpen, onClose, book, onStatusUpdate }) => {
                 payload[key] === undefined && delete payload[key]
             );
 
-            await onStatusUpdate(payload, book.isbn);
+            await onStatusUpdate(payload, book.isbn[0]);
             onClose();
         } catch (error) {
             console.error('Error updating status:', error);

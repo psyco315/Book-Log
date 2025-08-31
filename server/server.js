@@ -12,7 +12,7 @@ import userDataRoutes from './routes/userData.js'
 
 
 const app = express();
-const PORT = process.env.PORT || 3200;
+const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors({

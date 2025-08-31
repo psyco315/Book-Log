@@ -11,7 +11,7 @@ router.post('/:isbn/status', verifyToken, changeStatus);
 
 // Get specific book status for authenticated user  
 // GET /api/books/:bookId/status
-router.get('/:isbn/status', verifyToken, getBookStatus);
+router.get('/:bookId/status', verifyToken, getBookStatus);
 
 // Get all books for a user
 // GET /api/user/:userId/books

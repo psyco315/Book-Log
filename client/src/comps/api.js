@@ -21,6 +21,7 @@ const isTokenExpired = (token) => {
         // Decode JWT payload (base64)
         const payload = JSON.parse(atob(token.split('.')[1]));
         const currentTime = Date.now() / 1000; // Convert to seconds
+        // console.log(payload.exp, currentTime)
 
         // Check if token has expired
         return payload.exp < currentTime;
@@ -39,10 +40,8 @@ const clearAuthAndLogout = () => {
     // Dispatch logout event for auth context to pick up
     window.dispatchEvent(new CustomEvent('logout'));
 
-    // Only redirect if not already on login/signup page
-    if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/signup')) {
-        window.location.href = '/login';
-    }
+    console.log('Token removed')
+    // window.location.href = '/';
 };
 
 // Request interceptor for secured API (adds auth token and checks expiration)

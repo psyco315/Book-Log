@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios';
 import Navbar from '../home/Navbar'
 import StatusModal from './StatusModal' // Import the modal
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import { motion } from 'motion/react'
 import { fetchBooks, getDesc } from '../getData';
 import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
-import publicApi from '../api';
+import { publicApi, securedApi } from '../api';
+import { useAuth } from '@/context/auth';
 import Lottie from 'react-lottie-player'
 import './book.css'
 
@@ -19,13 +20,20 @@ import star2 from '../../assets/star2.png'
 import status from '../../assets/status.webp'
 import loadingCover from '../../assets/loadCover.png'
 import loadingAnimation from '../../assets/loading_gray.json'
+import finishedReading from '../../assets/finished.png'
+import reading from '../../assets/reading.png'
+import planToRead from '../../assets/plantoread.png'
 
 const Book = () => {
     const { isbn } = useParams();
     const [book, setBook] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
     const [screenWidth, setScreenWidth] = useState(0);
+    const [currBook, setCurrBook] = useState(null);
+    const [currBookStatus, setCurrBookStatus] = useState(null);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false); // Modal state
+
+    const { currUser } = useAuth()
 
     useEffect(() => {
         const handleResize = () => {
@@ -76,8 +84,6 @@ const Book = () => {
                                 ? descData.description
                                 : descData.description?.value || "No description available",
                         }));
-
-
                     }
                 } catch (err) {
                     console.error("Failed to fetch description:", err);
@@ -87,8 +93,6 @@ const Book = () => {
             console.error("Failed to fetch book:", err);
         }
     };
-
-
 
     const [imgLink, setImgLink] = useState(defCover);
     const [isLoading, setIsLoading] = useState(true);
@@ -123,7 +127,7 @@ const Book = () => {
             const response = await publicApi.post('/api/book/db', bookData);
 
             // Return successful response
-            console.log("very fine")
+            setCurrBook(response.data.book._id)
             return {
                 success: true,
                 data: response.data,
@@ -157,6 +161,24 @@ const Book = () => {
                     error: error.message
                 };
             }
+        }
+    };
+
+    // Function to fetch current book status
+    const fetchBookStatus = async (bookId) => {
+        try {
+            const response = await securedApi.get(`/api/userdata/${bookId}/status`);
+
+            if (response.data.success) {
+                setCurrBookStatus(response.data.userBook);
+            } else {
+                console.log('No status found for this book');
+                setCurrBookStatus(null);
+            }
+        } catch (error) {
+            console.error('Error fetching book status:', error);
+            // Set to null if no status exists or error occurs
+            setCurrBookStatus(null);
         }
     };
 
@@ -205,52 +227,6 @@ const Book = () => {
         return bookData;
     };
 
-    const updateBookCoverImage = async (isbn, imgLink) => {
-        try {
-            // Prepare data for update
-            const updateData = {
-                isbn: isbn,
-                coverImage: imgLink
-            };
-
-            // Send PUT/PATCH request to update cover image
-            const response = await publicApi.patch(
-                '/api/book/update-cover',
-                updateData
-            );
-
-            return {
-                success: true,
-                data: response.data,
-                message: response.data.message || 'Cover image updated successfully'
-            };
-
-        } catch (error) {
-            console.error('Error updating cover image:', error);
-
-            if (error.response) {
-                return {
-                    success: false,
-                    message: error.response.data.message || 'Server error occurred',
-                    status: error.response.status,
-                    data: error.response.data
-                };
-            } else if (error.request) {
-                return {
-                    success: false,
-                    message: 'No response from server. Please check your connection.',
-                    error: 'NETWORK_ERROR'
-                };
-            } else {
-                return {
-                    success: false,
-                    message: 'An unexpected error occurred',
-                    error: error.message
-                };
-            }
-        }
-    };
-
     useEffect(() => {
         loadBookAndDescription();
     }, [isbn]);
@@ -264,17 +240,29 @@ const Book = () => {
     useEffect(() => {
         if (imgLink !== '/src/assets/defCover.png' && book.description) {
             const uploadData = createBookData(book, imgLink)
-            console.log(uploadData)
             addBookToDb(uploadData)
         }
     }, [imgLink, book])
+
+    useEffect(() => {
+        if (currBook) {
+            fetchBookStatus(currBook);
+        }
+    }, [currBook])
+
+    useEffect(() => {
+        if (currBookStatus) {
+            // console.log(currBookStatus)
+        }
+
+    }, [currBookStatus])
 
 
     // Handle status update
     const handleStatusUpdate = async (statusData, isbn) => {
         try {
             const token = localStorage.getItem('authToken'); // Adjust based on how you store auth token
-            console.log(isbn)
+            // console.log(isbn)
 
             const response = await fetch(`http://localhost:3000/api/userdata/${isbn}/status`, {
                 method: 'POST',
@@ -289,6 +277,8 @@ const Book = () => {
 
             if (result.success) {
                 console.log('Status updated successfully:', result);
+                // Update the current book status state
+                setCurrBookStatus(result.userBook);
                 // You can add success notification here
             } else {
                 throw new Error(result.message || 'Failed to update status');
@@ -393,10 +383,31 @@ const Book = () => {
                         <div className='logBtnList flex justify-around'>
                             <button
                                 className='logBtn'
-                                onClick={() => setIsStatusModalOpen(true)} // Open modal
+                                onClick={() => setIsStatusModalOpen(true)}
                             >
-                                <img src={status} alt="" />
-                                <div>Status</div>
+                                <img
+                                    src={
+                                        currBookStatus?.status === "plan-to-read"
+                                            ? planToRead
+                                            : currBookStatus?.status === "reading"
+                                                ? reading
+                                                : currBookStatus?.status === "read"
+                                                    ? finishedReading
+                                                    : status // default icon if no status
+                                    }
+                                    alt="status icon"
+                                />
+                                <div>
+                                    {currBookStatus?.status
+                                        ? currBookStatus.status === "plan-to-read"
+                                            ? "Plan to Read"
+                                            : currBookStatus.status === "reading"
+                                                ? "Reading"
+                                                : currBookStatus.status === "read"
+                                                    ? "Finished"
+                                                    : "Not Set"
+                                        : "Set Status"}
+                                </div>
                             </button>
 
                             <button className='logBtn'>
@@ -450,6 +461,7 @@ const Book = () => {
                 isOpen={isStatusModalOpen}
                 onClose={() => setIsStatusModalOpen(false)}
                 book={book}
+                currentStatus={currBookStatus}
                 onStatusUpdate={handleStatusUpdate}
             />
         </div>
