@@ -4,7 +4,7 @@
 .navBar {
     position: relative;
     top: 0;
-    z-index: 50;
+    z-index: 10;
     padding: 0.875rem 0.25rem 0.5rem 0.25rem;
     background-color: #141219;
     width: 100%;

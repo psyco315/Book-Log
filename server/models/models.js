@@ -175,37 +175,17 @@ const reviewSchema = new Schema({
   title: {
     type: String,
     trim: true,
-    maxlength: 200,
-    default: ''
+    maxlength: 200
   },
   content: {
     type: String,
-    required: true,
-    maxlength: 5000
+    maxlength: 5000,
+    default: ''
   },
   rating: {
     type: Number,
     min: 1,
-    max: 5,
-    required: true
-  },
-  spoilerWarning: {
-    type: Boolean,
-    default: false
-  },
-  tags: [String],
-  visibility: {
-    type: String,
-    enum: ['public', 'private', 'friends'],
-    default: 'public'
-  },
-  likes: {
-    type: Number,
-    default: 0
-  },
-  comments: {
-    type: Number,
-    default: 0
+    max: 5
   },
   editHistory: [{
     content: String,

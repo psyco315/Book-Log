@@ -9,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 20;
 }
 
 .modal-content {
@@ -261,6 +261,52 @@
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Add these styles to your statusmodal.css file */
+
+.login-required {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.login-message h4 {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+}
+
+.login-message p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+}
+
+.login-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Responsive for mobile */
+@media (max-width: 575px) {
+    .login-actions {
+        flex-direction: column;
+    }
+
+    .login-message {
+        padding: 1rem 0;
+    }
+
+    .login-message h4 {
+        font-size: 1.2rem;
+    }
+
+    .login-message p {
+        font-size: 0.9rem;
+    }
 }
 
 /* Mobile styles */

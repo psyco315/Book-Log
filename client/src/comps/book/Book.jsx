@@ -9,6 +9,8 @@ import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
 import { publicApi, securedApi } from '../api';
 import { useAuth } from '@/context/auth';
 import Lottie from 'react-lottie-player'
+import StarRatingBox from './StarRatingBox';
+import ReviewModal from './ReviewModal';
 import './book.css'
 
 import defCover from '../../assets/defCover.png'
@@ -32,8 +34,29 @@ const Book = () => {
     const [currBook, setCurrBook] = useState(null);
     const [currBookStatus, setCurrBookStatus] = useState(null);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false); // Modal state
+    const [userRating, setUserRating] = useState(0);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-    const { currUser } = useAuth()
+    const { currUser, loggedIn } = useAuth()
+
+    const handleSubmitReview = async (reviewData) => {
+        try {
+            // Call your review API endpoint
+            const response = await securedApi.post('/api/reviews', reviewData);
+            console.log('Review submitted successfully:', response.data);
+            // You can add success notification here
+            return response.data;
+        } catch (error) {
+            console.error('Failed to submit review:', error);
+            throw error;
+        }
+    };
+
+    const handleRatingChange = (newRating) => {
+        setUserRating(newRating);
+        console.log('User rated:', newRating);
+        // Call your review API here
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -249,7 +272,7 @@ const Book = () => {
         if (currBook) {
             fetchBookStatus(currBook);
         }
-    }, [currBook])
+    }, [currBook, loggedIn])
 
     useEffect(() => {
         if (currBookStatus) {
@@ -419,17 +442,19 @@ const Book = () => {
                         </div>
 
                         <div className='rateStarBox flex flex-col items-center'>
-                            <div className='flex justify-around'>
-                                <img src={star} alt="" />
-                                <img src={star} alt="" />
-                                <img src={star} alt="" />
-                                <img src={star} alt="" />
-                                <img src={star} alt="" />
-                            </div>
+                            <StarRatingBox
+                                currentRating={userRating}
+                                onRatingChange={handleRatingChange}
+                                starImage={star2}
+                            />
                             <button>Rate</button>
                         </div>
 
-                        <div className='postRev'>
+                        <div
+                            className='postRev'
+                            onClick={() => setIsReviewModalOpen(true)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             Post review
                         </div>
                     </div>
@@ -460,6 +485,14 @@ const Book = () => {
                 book={book}
                 currentStatus={currBookStatus}
                 onStatusUpdate={handleStatusUpdate}
+            />
+
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                book={book}
+                currentRating={userRating}
+                onSubmitReview={handleSubmitReview}
             />
         </div>
     )
