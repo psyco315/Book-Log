@@ -239,7 +239,7 @@ const Book = () => {
     }, [book]);
 
     useEffect(() => {
-        if (imgLink !== '/src/assets/defCover.png' && book.description) {
+        if (imgLink !== '/src/assets/defCover.png' && book?.description) {
             const uploadData = createBookData(book, imgLink)
             addBookToDb(uploadData)
         }
