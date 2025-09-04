@@ -59,7 +59,7 @@ const Landing = () => {
                             className={`yellowBtn rounded-br rounded-tr hover:scale-105 transition-transform duration-100 hover:cursor-pointer ${
                                 searchQuery.trim() 
                                     ? 'bg-[#FFE434] text-black hover:bg-[#9a8a20] hover:text-white' 
-                                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                    : 'bg-[#a69f72] text-gray-600 cursor-not-allowed'
                             }`}
                             onClick={handleSearch}
                             disabled={!searchQuery.trim()}
