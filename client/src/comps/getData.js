@@ -1,7 +1,7 @@
 import { publicApi } from './api';
 import axios from 'axios'
 
-export const fetchBooks = async ({ q = "", author = "", title = "", subject = "", isbn = "", limit = 10 }) => {
+export const fetchBooks = async ({ q = "", author = "", title = "", subject = "", isbn = "", limit = 10, page=1 }) => {
     // ✅ Check if all params are empty
     if (![q, author, title, subject, isbn].some(param => param && param.trim() !== "")) {
         throw new Error("At least one of q, author, title, isbn or subject must be provided.");
@@ -15,12 +15,14 @@ export const fetchBooks = async ({ q = "", author = "", title = "", subject = ""
             subject,
             isbn,
             limit,
-            sort: "currently_reading"
+            page,
+            sort: "readinglog"
         });
 
         const url = `/api/book/search?${params.toString()}`;
 
         const { data } = await publicApi.get(url);
+
         return data;
     } catch (err) {
         console.error(`Error fetching "${title}":`, err.message);

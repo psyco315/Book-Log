@@ -4,6 +4,7 @@ import Navbar from '../home/Navbar'
 import StatusModal from './StatusModal' // Import the modal
 import { data, useParams } from "react-router-dom";
 import { motion } from 'motion/react'
+import { Link } from 'react-router-dom';
 import { fetchBooks, getDesc } from '../getData';
 import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
 import { publicApi, securedApi } from '../api';
@@ -11,6 +12,8 @@ import { useAuth } from '@/context/auth';
 import Lottie from 'react-lottie-player'
 import StarRatingBox from './StarRatingBox';
 import ReviewModal from './ReviewModal';
+import LoadingScreen from './LoadingScreen';
+import ListModal from './ListModal';
 import './book.css'
 
 import defCover from '../../assets/defCover.png'
@@ -25,6 +28,7 @@ import loadingAnimation from '../../assets/loading_gray.json'
 import finishedReading from '../../assets/finished.png'
 import reading from '../../assets/reading.png'
 import planToRead from '../../assets/plantoread.png'
+import hold from '../../assets/hold.webp'
 
 const Book = () => {
     const { isbn } = useParams();
@@ -33,29 +37,163 @@ const Book = () => {
     const [screenWidth, setScreenWidth] = useState(0);
     const [currBook, setCurrBook] = useState(null);
     const [currBookStatus, setCurrBookStatus] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(true);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false); // Modal state
     const [userRating, setUserRating] = useState(0);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [existingReview, setExistingReview] = useState(null);
+    const [isRatingSubmitting, setIsRatingSubmitting] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavoriteSubmitting, setIsFavoriteSubmitting] = useState(false);
+    const [isListModalOpen, setIsListModalOpen] = useState(false);
 
     const { currUser, loggedIn } = useAuth()
 
-    const handleSubmitReview = async (reviewData) => {
+    // Fetch existing review for the current user and book
+    const fetchExistingReview = async (bookId) => {
+        if (!loggedIn || !currUser || !bookId) return;
+
         try {
-            // Call your review API endpoint
-            const response = await securedApi.post('/api/reviews', reviewData);
-            console.log('Review submitted successfully:', response.data);
-            // You can add success notification here
-            return response.data;
+            const response = await securedApi.get(`/api/review?bookId=${bookId}&userId=${currUser._id}`);
+
+            if (response.data.reviews && response.data.reviews.length > 0) {
+                const review = response.data.reviews[0];
+                setExistingReview(review);
+                setUserRating(review.rating || 0);
+            } else {
+                setExistingReview(null);
+                setUserRating(0);
+            }
         } catch (error) {
-            console.error('Failed to submit review:', error);
-            throw error;
+            console.error('Error fetching existing review:', error);
+            setExistingReview(null);
+            setUserRating(0);
+        }
+    };
+
+    // Handle rating-only submission (when star is clicked)
+    const handleRatingSubmission = async (newRating) => {
+        if (!loggedIn || !currUser || !currBook) {
+            console.log('User not logged in or book not loaded');
+            return;
+        }
+
+        setIsRatingSubmitting(true);
+
+        try {
+            if (existingReview) {
+                // Update existing review with new rating
+                // console.log(newRating)
+                const response = await securedApi.put(`/api/review/${existingReview._id}`, {
+                    rating: newRating,
+                    title: existingReview.title || '',
+                    content: existingReview.content || ''
+                });
+
+                if (response.data.review) {
+                    setExistingReview(response.data.review);
+                    console.log('Rating updated successfully');
+                }
+            } else {
+                // Create new review with only rating
+                const reviewData = {
+                    bookId: currBook,
+                    rating: newRating
+                };
+
+                const response = await securedApi.post('/api/review', reviewData);
+
+                if (response.data.review) {
+                    setExistingReview(response.data.review);
+                    console.log('Rating submitted successfully');
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            // Revert rating on error
+            setUserRating(existingReview?.rating || 0);
+        } finally {
+            setIsRatingSubmitting(false);
         }
     };
 
     const handleRatingChange = (newRating) => {
         setUserRating(newRating);
-        console.log('User rated:', newRating);
-        // Call your review API here
+        handleRatingSubmission(newRating);
+    };
+
+    // Handle favorite toggle
+    const handleFavoriteToggle = async () => {
+        if (!loggedIn || !currUser || !book) {
+            console.log('User not logged in or book not loaded');
+            return;
+        }
+
+        setIsFavoriteSubmitting(true);
+
+        try {
+            console.log("Old favorite:", currBookStatus?.isFavorite)
+            const bookIsbn = Array.isArray(book.isbn) ? book.isbn[0] : book.isbn;
+            const newFavoriteStatus = !currBookStatus?.isFavorite;
+            console.log("Changing favorite to:", newFavoriteStatus)
+
+            const response = await securedApi.put(`/api/userdata/${bookIsbn}/status`, {
+                userId: currUser,
+                isFavorite: newFavoriteStatus
+            });
+
+            if (response.data.success) {
+                fetchBookStatus(currBook)
+                console.log('Favorite changed to:', newFavoriteStatus);
+            } else {
+                throw new Error(response.data.message || 'Failed to update favorite status');
+            }
+        } catch (error) {
+            console.error('Error updating favorite status:', error);
+            // Revert state on error
+            setIsFavorite(!isFavorite);
+        } finally {
+            setIsFavoriteSubmitting(false);
+        }
+    };
+
+    // Handle review submission from modal
+    const handleSubmitReview = async (reviewData) => {
+        try {
+            if (existingReview) {
+                // Update existing review
+                const response = await securedApi.put(`/api/review/${existingReview._id}`, {
+                    ...reviewData,
+                    rating: userRating || reviewData.rating || existingReview.rating
+                });
+
+                if (response.data.review) {
+                    setExistingReview(response.data.review);
+                    console.log('Review updated successfully');
+                }
+
+                return response.data;
+            } else {
+                // Create new review
+                const fullReviewData = {
+                    ...reviewData,
+                    bookId: currBook,
+                    rating: userRating || reviewData.rating
+                };
+
+                const response = await securedApi.post('/api/review', fullReviewData);
+
+                if (response.data.review) {
+                    setExistingReview(response.data.review);
+                    console.log('Review created successfully');
+                }
+
+                return response.data;
+            }
+        } catch (error) {
+            console.error('Failed to submit review:', error);
+            throw error;
+        }
     };
 
     useEffect(() => {
@@ -147,10 +285,7 @@ const Book = () => {
 
     const addBookToDb = async (bookData) => {
         try {
-            // Send POST request to the API
             const response = await publicApi.post('/api/book/db', bookData);
-
-            // Return successful response
             setCurrBook(response.data.book._id)
             return {
                 success: true,
@@ -161,9 +296,7 @@ const Book = () => {
         } catch (error) {
             console.error('Error adding book to database:', error);
 
-            // Handle different error types
             if (error.response) {
-                // Server responded with error status
                 return {
                     success: false,
                     message: error.response.data.message || 'Server error occurred',
@@ -171,14 +304,12 @@ const Book = () => {
                     data: error.response.data
                 };
             } else if (error.request) {
-                // Request was made but no response received
                 return {
                     success: false,
                     message: 'No response from server. Please check your connection.',
                     error: 'NETWORK_ERROR'
                 };
             } else {
-                // Something else happened
                 return {
                     success: false,
                     message: 'An unexpected error occurred',
@@ -195,14 +326,20 @@ const Book = () => {
 
             if (response.data.success) {
                 setCurrBookStatus(response.data.userBook);
+                // Set favorite status from the fetched data
+                setIsFavorite(response.data.userBook?.isFavourite || false);
             } else {
                 console.log('No status found for this book');
                 setCurrBookStatus(null);
+                setIsFavorite(false);
             }
         } catch (error) {
             console.error('Error fetching book status:', error);
-            // Set to null if no status exists or error occurs
             setCurrBookStatus(null);
+            setIsFavorite(false);
+        }
+        finally {
+            setStatusLoading(false)
         }
     };
 
@@ -257,6 +394,7 @@ const Book = () => {
 
     useEffect(() => {
         if (book) {
+            // console.log(book)
             loadCover();
         }
     }, [book]);
@@ -271,23 +409,19 @@ const Book = () => {
     useEffect(() => {
         if (currBook) {
             fetchBookStatus(currBook);
+            fetchExistingReview(currBook);
         }
     }, [currBook, loggedIn])
 
     useEffect(() => {
         if (currBookStatus) {
-            // console.log(currBookStatus)
+            setIsFavorite(currBookStatus?.isFavorite)
         }
-
     }, [currBookStatus])
-
 
     // Handle status update
     const handleStatusUpdate = async (statusData, isbn) => {
         try {
-            const token = localStorage.getItem('authToken'); // Adjust based on how you store auth token
-            // console.log(isbn)
-
             const response = await securedApi.post(
                 `/api/userdata/${isbn}/status`,
                 statusData
@@ -297,19 +431,17 @@ const Book = () => {
 
             if (result.success) {
                 console.log('Status updated successfully:', result);
-                // Update the current book status state
                 setCurrBookStatus(result.userBook);
-                // You can add success notification here
             } else {
                 throw new Error(result.message || 'Failed to update status');
             }
         } catch (error) {
             console.error('Error updating status:', error);
-            throw error; // Re-throw to let modal handle the error
+            throw error;
         }
     };
 
-    if (!book) return <p>Loading...</p>;
+    if (!book) return <LoadingScreen />;
 
     return (
         <div className='globalDiv'>
@@ -387,94 +519,125 @@ const Book = () => {
                         <div className='genreTitle'>Genre</div>
                         <div className='genreList flex flex-wrap '>
                             {book.subject.map((genre, index) => (
-                                <div
-                                    key={index}
-                                    className="genreItem text-black bg-[#AEAEAE] hover:text-white/70 hover:bg-[#565656] hover:cursor-pointer"
-                                >
-                                    {genre}
-                                </div>
+                                <Link to={`/search?subject=${genre}`}>
+                                    <div
+                                        key={index}
+                                        className="genreItem text-black bg-[#AEAEAE] hover:text-white/70 hover:bg-[#565656] hover:cursor-pointer"
+                                    >
+                                        {genre}
+                                    </div>
+                                </Link>
                             ))}
                         </div>
                     </div>
                 </div>
 
                 <div className='rateCol'>
-                    <div className='userBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
-                        <div className='logBtnList flex justify-around'>
-                            <button
-                                className='logBtn'
-                                onClick={() => setIsStatusModalOpen(true)}
-                            >
-                                <img
-                                    src={
-                                        currBookStatus?.status === "plan-to-read"
-                                            ? planToRead
-                                            : currBookStatus?.status === "reading"
-                                                ? reading
-                                                : currBookStatus?.status === "read"
-                                                    ? finishedReading
-                                                    : status // default icon if no status
-                                    }
-                                    alt="status icon"
-                                />
-                                <div>
-                                    {currBookStatus?.status
-                                        ? currBookStatus.status === "plan-to-read"
-                                            ? "Plan to Read"
-                                            : currBookStatus.status === "reading"
-                                                ? "Reading"
-                                                : currBookStatus.status === "read"
-                                                    ? "Finished"
-                                                    : "Not Set"
-                                        : "Set Status"}
-                                </div>
-                            </button>
-
-                            <button className='logBtn'>
-                                <img src={heart1} alt="" />
-                                <div>Favourite?</div>
-                            </button>
-
-                            <button className='logBtn'>
-                                <img src={readList} alt="" />
-                                <div>Add to List</div>
-                            </button>
-                        </div>
-
-                        <div className='rateStarBox flex flex-col items-center'>
-                            <StarRatingBox
-                                currentRating={userRating}
-                                onRatingChange={handleRatingChange}
-                                starImage={star2}
+                    {statusLoading && loggedIn ? (
+                        // Show loading animation while status is being fetched
+                        <div className='flex justify-center items-center min-h-[200px]'>
+                            <Lottie
+                                loop
+                                animationData={loadingAnimation}
+                                play
+                                style={{ width: 100, height: 100 }}
                             />
-                            <button>Rate</button>
                         </div>
+                    ) : (
+                        <>
+                            <div className='userBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
+                                <div className='logBtnList flex justify-around'>
+                                    <button
+                                        className='logBtn'
+                                        onClick={() => setIsStatusModalOpen(true)}
+                                    >
+                                        <img
+                                            src={
+                                                currBookStatus?.status === "plan-to-read"
+                                                    ? planToRead
+                                                    : currBookStatus?.status === "reading"
+                                                        ? reading
+                                                        : currBookStatus?.status === "read"
+                                                            ? finishedReading
+                                                            : currBookStatus?.status === 'on-hold'
+                                                                ? hold
+                                                                : status // default icon if no status
+                                            }
+                                            alt="status icon"
+                                        />
+                                        <div>
+                                            {currBookStatus?.status
+                                                ? currBookStatus.status === "plan-to-read"
+                                                    ? "Plan to Read"
+                                                    : currBookStatus.status === "reading"
+                                                        ? "Reading"
+                                                        : currBookStatus.status === "read"
+                                                            ? "Finished"
+                                                            : currBookStatus.status === 'on-hold'
+                                                                ? "On hold"
+                                                                : "Not Set"
+                                                : "Set Status"}
+                                        </div>
+                                    </button>
 
-                        <div
-                            className='postRev'
-                            onClick={() => setIsReviewModalOpen(true)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            Post review
-                        </div>
-                    </div>
+                                    <button
+                                        className='logBtn'
+                                        onClick={handleFavoriteToggle}
+                                        disabled={isFavoriteSubmitting}
+                                        style={{ opacity: isFavoriteSubmitting ? 0.5 : 1 }}
+                                    >
+                                        <img src={isFavorite ? heart2 : heart1} alt="" />
+                                        <div>{isFavorite ? 'Favourite!' : 'Favourite?'}</div>
+                                    </button>
 
-                    <div className='ratingBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
-                        <div>
-                            <div>Average Rating</div>
-                            <div className='flex justify-center items-center'>
-                                <img src={star2} alt="" />
-                                <div>{book.ratings_average}</div>
+                                    <button
+                                        className='logBtn'
+                                        onClick={() => setIsListModalOpen(true)}
+                                    >
+                                        <img src={readList} alt="" />
+                                        <div>Add to List</div>
+                                    </button>
+                                </div>
+
+                                <div className='rateStarBox flex flex-col items-center'>
+                                    <StarRatingBox
+                                        currentRating={userRating}
+                                        onRatingChange={handleRatingChange}
+                                        starImage={star2}
+                                        disabled={isRatingSubmitting}
+                                    />
+                                    <div style={{ opacity: isRatingSubmitting ? 0.5 : 1 }}>
+                                        {isRatingSubmitting ? 'Saving...' : 'Rate'}
+                                    </div>
+                                </div>
+
+                                <div
+                                    className='postRev'
+                                    onClick={() => setIsReviewModalOpen(true)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {existingReview?.content ? 'Edit Review' : 'Post Review'}
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div>BookStop Rating</div>
-                            <div className='flex justify-center items-center'>
-                                <img src={star2} alt="" />
-                                <div>{book.ratings_average}</div>
+
+                            <div className='ratingBox bg-gradient-to-br from-white/20 via-white/10 to-white/5 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30'>
+                                <div>
+                                    <div>Average Rating</div>
+                                    <div className='flex justify-center items-center'>
+                                        <img src={star2} alt="" />
+                                        <div>{book.ratings_average}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>BookStop Rating</div>
+                                    <div className='flex justify-center items-center'>
+                                        <img src={star2} alt="" />
+                                        <div>{book.ratings_average}</div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </div>
             </motion.div>
 
@@ -490,9 +653,17 @@ const Book = () => {
             <ReviewModal
                 isOpen={isReviewModalOpen}
                 onClose={() => setIsReviewModalOpen(false)}
-                book={book}
+                book={{ ...book, _id: currBook }}
                 currentRating={userRating}
+                existingReview={existingReview}
                 onSubmitReview={handleSubmitReview}
+            />
+
+            <ListModal
+                isOpen={isListModalOpen}
+                onClose={() => setIsListModalOpen(false)}
+                book={book}
+                currBook={currBook}
             />
         </div>
     )

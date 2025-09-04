@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 const validateReviewData = (data) => {
   const { rating, content, title } = data;
   
+    // console.log({ title, content, rating })
+  
   // Must have either rating or content (or both)
   if (!rating && !content) {
     return { isValid: false, error: 'Either rating or written review is required' };
@@ -16,8 +18,8 @@ const validateReviewData = (data) => {
   }
   
   // Validate rating range
-  if (rating && (rating < 1 || rating > 5)) {
-    return { isValid: false, error: 'Rating must be between 1 and 5' };
+  if (rating && (rating < .5 || rating > 5)) {
+    return { isValid: false, error: 'Rating must be between 1 and 5 yawrrr' };
   }
   
   return { isValid: true };
@@ -29,7 +31,7 @@ const validateReviewData = (data) => {
 export const createReview = async (req, res) => {
   try {
     const { bookId, userBookId, title, content, rating } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     // Validate required fields
     if (!bookId) {
@@ -161,10 +163,12 @@ export const getReviewById = async (req, res) => {
 // @route   PUT /api/reviews/:id
 // @access  Private
 export const updateReview = async (req, res) => {
+  // console.log("halor")
+
   try {
     const { id } = req.params;
     const { title, content, rating } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid review ID' });
@@ -232,7 +236,7 @@ export const updateReview = async (req, res) => {
 export const deleteReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
+    const userId = req.user.userId;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid review ID' });

@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { securedApi } from '../api';
 
-const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
+const ReviewModal = ({ isOpen, onClose, book, existingReview, onSubmitReview }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
+
+    // Populate form with existing review data when modal opens
+    useEffect(() => {
+        if (isOpen && existingReview) {
+            setTitle(existingReview.title || '');
+            setContent(existingReview.content || '');
+        } else if (isOpen && !existingReview) {
+            // Reset form for new review
+            setTitle('');
+            setContent('');
+        }
+        // Clear errors when modal opens
+        setErrors({});
+    }, [isOpen, existingReview]);
 
     // Validation function
     const validateForm = () => {
@@ -42,17 +57,20 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
         setIsSubmitting(true);
 
         const reviewData = {
-            bookId: book._id || book.id,
             title: title.trim() || undefined,
             content: content.trim() || undefined
         };
+
+        // Add bookId for new reviews
+        if (!existingReview) {
+            reviewData.bookId = book._id || book.id;
+        }
 
         onSubmitReview(reviewData)
             .then(() => {
                 // Reset form and close modal on success
                 setTitle('');
                 setContent('');
-                setRating(0);
                 setErrors({});
                 onClose();
             })
@@ -69,12 +87,56 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
 
     const handleClose = () => {
         if (!isSubmitting) {
+            // Reset form to original state when closing
+            if (existingReview) {
+                setTitle(existingReview.title || '');
+                setContent(existingReview.content || '');
+            } else {
+                setTitle('');
+                setContent('');
+            }
             setErrors({});
             onClose();
         }
     };
 
+    // Handle delete review (for existing reviews)
+    const handleDeleteReview = async () => {
+        if (!existingReview || !window.confirm('Are you sure you want to delete this review?')) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            // You'll need to import securedApi or pass a delete function as prop
+            await securedApi.delete(`/api/review/${existingReview._id}`);
+            
+            // Reset everything and close modal
+            setTitle('');
+            setContent('');
+            setErrors({});
+            
+            // Refresh the existing review state in parent component
+            // You might want to pass a callback for this
+            if (typeof onReviewDeleted === 'function') {
+                onReviewDeleted();
+            }
+            
+            onClose();
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            setErrors({
+                general: error.response?.data?.message || 'Failed to delete review. Please try again.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     if (!isOpen) return null;
+
+    const isEditing = Boolean(existingReview);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -89,7 +151,9 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
                 {/* Header */}
                 <div className="p-6 border-b border-gray-700">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-white">Write a Review</h2>
+                        <h2 className="text-xl font-bold text-white">
+                            {isEditing ? 'Edit Review' : 'Write a Review'}
+                        </h2>
                         <button
                             onClick={handleClose}
                             disabled={isSubmitting}
@@ -106,6 +170,13 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
                         <div className="font-medium">{book?.title}</div>
                         <div>{book?.author_name?.join(', ')}</div>
                     </div>
+
+                    {/* Show if editing */}
+                    {isEditing && (
+                        <div className="mt-2 text-xs text-yellow-400">
+                            Editing existing review
+                        </div>
+                    )}
                 </div>
 
                 {/* Content */}
@@ -142,7 +213,7 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
                     {/* Content Field */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Review (optional)
+                            Review
                         </label>
                         <textarea
                             value={content}
@@ -163,6 +234,18 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
 
                     {/* Buttons */}
                     <div className="flex gap-3 pt-4">
+                        {/* Delete button for existing reviews */}
+                        {isEditing && (
+                            <button
+                                type="button"
+                                onClick={handleDeleteReview}
+                                disabled={isSubmitting}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Delete
+                            </button>
+                        )}
+
                         <button
                             type="button"
                             onClick={handleClose}
@@ -182,10 +265,10 @@ const ReviewModal = ({ isOpen, onClose, book, onSubmitReview }) => {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Submitting...
+                                    {isEditing ? 'Updating...' : 'Submitting...'}
                                 </>
                             ) : (
-                                'Post Review'
+                                isEditing ? 'Update Review' : 'Post Review'
                             )}
                         </button>
                     </div>

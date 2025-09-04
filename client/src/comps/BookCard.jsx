@@ -15,16 +15,27 @@ const BookCard = ({ data }) => {
     const {
         author_key,
         author_name,
+        title,
+        lccn,
+        isbn,
         first_publish_year,
         language,
         number_of_pages_median,
-        title,
         subject,
         ratings_average,
         readinglog_count,
-        lccn,
-        isbn
     } = data;
+
+    // console.log({
+    //     author_name,
+    //     title,
+    //     lccn,
+    //     isbn,
+    // })
+
+    if(!isbn || isbn.length === 0){
+        return
+    }
 
     const [imgLink, setImgLink] = useState(defaultCover);
     const [isLoading, setIsLoading] = useState(true);

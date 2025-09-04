@@ -10,6 +10,7 @@ import bookRoutes from './routes/book.js';
 import authRoutes from './routes/auth.js'
 import userDataRoutes from './routes/userData.js'
 import reviewRoutes from './routes/review.js'
+import listRoutes from './routes/list.js'
 
 
 const app = express();
@@ -46,6 +47,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/userdata', userDataRoutes);
 app.use('/api/review', reviewRoutes);
+app.use('/api/list', listRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

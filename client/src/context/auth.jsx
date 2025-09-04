@@ -8,10 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [authModal, setAuthModal] = useState(false); // Sign-in modal state
   const [loggedIn, setLoggedIn] = useState(false);   // Auth state
   const [currUser, setCurrUser] = useState(null);
+  const [onSearch, setOnSearch] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("authToken") || null);
 
   return (
-    <AuthContext.Provider value={{ authModal, setAuthModal, loggedIn, setLoggedIn, currUser, setCurrUser, token, setToken }}>
+    <AuthContext.Provider value={{ authModal, setAuthModal, loggedIn, setLoggedIn, currUser, setCurrUser, token, setToken, onSearch, setOnSearch }}>
       {children}
     </AuthContext.Provider>
   );

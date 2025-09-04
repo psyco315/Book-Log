@@ -1,29 +1,136 @@
+// bookHelper.js
 import { fetchBooks, getDesc } from '../getData';
 import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
 import { publicApi, securedApi } from '../api';
-import axios from 'axios';
 
-const handleSubmitReview = async (reviewData) => {
+/** --- Review Helpers --- */
+
+/**
+ * Fetch existing review and set states.
+ */
+export const fetchExistingReview = async (bookId, currUser, loggedIn, setExistingReview, setUserRating) => {
+    if (!loggedIn || !currUser || !bookId) {
+        if (setExistingReview) setExistingReview(null);
+        if (setUserRating) setUserRating(0);
+        return null;
+    }
+
     try {
-        // Call your review API endpoint
-        const response = await securedApi.post('/api/reviews', reviewData);
-        console.log('Review submitted successfully:', response.data);
-        // You can add success notification here
-        return response.data;
+        const response = await securedApi.get(`/api/review?bookId=${bookId}&userId=${currUser._id}`);
+        if (response.data.reviews && response.data.reviews.length > 0) {
+            const review = response.data.reviews[0];
+            if (setExistingReview) setExistingReview(review);
+            if (setUserRating) setUserRating(review.rating || 0);
+            return review;
+        } else {
+            if (setExistingReview) setExistingReview(null);
+            if (setUserRating) setUserRating(0);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching existing review:', error);
+        if (setExistingReview) setExistingReview(null);
+        if (setUserRating) setUserRating(0);
+        return null;
+    }
+};
+
+/**
+ * Submit or update rating only. Handles setting submitting state and updating stored review & rating.
+ */
+export const submitRating = async (
+    newRating,
+    existingReview,
+    currBook,
+    currUser,
+    setExistingReview,
+    setUserRating,
+    setIsRatingSubmitting
+) => {
+    if (setIsRatingSubmitting) setIsRatingSubmitting(true);
+
+    try {
+        if (!currUser || !currBook) throw new Error('Missing user or book');
+
+        if (existingReview) {
+            const response = await securedApi.put(`/api/review/${existingReview._id}`, {
+                rating: newRating,
+                title: existingReview.title || '',
+                content: existingReview.content || ''
+            });
+
+            if (response.data.review) {
+                if (setExistingReview) setExistingReview(response.data.review);
+                if (setUserRating) setUserRating(response.data.review.rating || 0);
+                return response.data.review;
+            }
+        } else {
+            const reviewData = { bookId: currBook, rating: newRating };
+            const response = await securedApi.post('/api/review', reviewData);
+
+            if (response.data.review) {
+                if (setExistingReview) setExistingReview(response.data.review);
+                if (setUserRating) setUserRating(response.data.review.rating || newRating);
+                return response.data.review;
+            }
+        }
+    } catch (error) {
+        console.error('Error submitting rating:', error);
+        // Revert rating if provided
+        if (setUserRating && existingReview) setUserRating(existingReview.rating || 0);
+        if (setUserRating && !existingReview) setUserRating(0);
+        throw error;
+    } finally {
+        if (setIsRatingSubmitting) setIsRatingSubmitting(false);
+    }
+};
+
+/**
+ * Submit or update full review (title/content + rating). Updates state via setter.
+ */
+export const submitReview = async (
+    reviewData,
+    existingReview,
+    currBook,
+    userRating,
+    setExistingReview
+) => {
+    try {
+        if (!currBook) throw new Error('Missing book id');
+
+        if (existingReview) {
+            const response = await securedApi.put(`/api/review/${existingReview._id}`, {
+                ...reviewData,
+                rating: userRating || reviewData.rating || existingReview.rating
+            });
+
+            if (response.data.review) {
+                if (setExistingReview) setExistingReview(response.data.review);
+                return response.data;
+            }
+        } else {
+            const fullReviewData = {
+                ...reviewData,
+                bookId: currBook,
+                rating: userRating || reviewData.rating
+            };
+            const response = await securedApi.post('/api/review', fullReviewData);
+
+            if (response.data.review) {
+                if (setExistingReview) setExistingReview(response.data.review);
+                return response.data;
+            }
+        }
+        return null;
     } catch (error) {
         console.error('Failed to submit review:', error);
         throw error;
     }
 };
 
-const handleRatingChange = (newRating, setUserRating) => {
-    setUserRating(newRating);
-    console.log('User rated:', newRating);
-    // Call your review API here
-};
+/** --- Book Data Helpers --- */
 
-
-const cleanSubjects = (subjects) => {
+export const cleanSubjects = (subjects) => {
     if (!Array.isArray(subjects)) return [];
 
     const result = subjects
@@ -36,84 +143,91 @@ const cleanSubjects = (subjects) => {
     return result;
 };
 
-const loadBookAndDescription = async () => {
-    if (!isbn) return;
+/**
+ * Loads book and description, then sets book state using setBook.
+ */
+export const loadBookAndDescription = async (isbn, setBook) => {
+    if (!isbn) return null;
 
     try {
-        const bookData = await fetchBooks({ isbn: isbn });
+        const bookData = await fetchBooks({ isbn });
         if (bookData?.data) {
             const finalData = bookData.data.books[0];
             finalData.subject = cleanSubjects(finalData.subject);
-            finalData.description = ''
+            finalData.description = '';
 
             if (finalData.ratings_average) {
                 finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
             }
 
-            setBook(finalData);
-
             try {
                 const descData = await getDesc(finalData.title, finalData.author_name);
                 if (descData) {
-                    setBook(prev => ({
-                        ...prev,
-                        description: typeof descData.description === "string"
-                            ? descData.description
-                            : descData.description?.value || "No description available",
-                    }));
+                    finalData.description = typeof descData.description === "string"
+                        ? descData.description
+                        : descData.description?.value || "No description available";
                 }
             } catch (err) {
                 console.error("Failed to fetch description:", err);
             }
+
+            if (setBook) setBook(finalData);
+            return finalData;
         }
+        return null;
     } catch (err) {
         console.error("Failed to fetch book:", err);
+        if (setBook) setBook(null);
+        return null;
     }
 };
 
-const loadCover = async () => {
+/**
+ * Load cover URL using fallback functions. Sets img link and loading state.
+ */
+export const loadCover = async (book, setImgLink, setIsLoading) => {
+    if (setIsLoading) setIsLoading(true);
+
     try {
-        let coverUrl = await imgFunc1(book.title, book.author_name);
-
-        if (!coverUrl) {
-            coverUrl = await imgFunc2(book.lccn, book.title);
-        }
-
-        if (!coverUrl) {
-            coverUrl = await imgFunc3(book.isbn, book.title);
+        let coverUrl = null;
+        if (book) {
+            coverUrl = await imgFunc1(book.title, book.author_name);
+            if (!coverUrl) coverUrl = await imgFunc2(book.lccn, book.title);
+            if (!coverUrl) coverUrl = await imgFunc3(book.isbn, book.title);
         }
 
         if (coverUrl) {
-            setImgLink(coverUrl);
+            if (setImgLink) setImgLink(coverUrl);
+            return coverUrl;
         }
 
+        return null;
     } catch (error) {
         console.error('Error loading cover:', error);
-        setImgLink(defCover);
+        return null;
     } finally {
-        setIsLoading(false);
+        if (setIsLoading) setIsLoading(false);
     }
 };
 
-const addBookToDb = async (bookData) => {
+/**
+ * Add book to DB and set currBook id state.
+ */
+export const addBookToDb = async (bookData, setCurrBook) => {
     try {
-        // Send POST request to the API
         const response = await publicApi.post('/api/book/db', bookData);
-
-        // Return successful response
-        setCurrBook(response.data.book._id)
+        if (response?.data?.book?._id) {
+            if (setCurrBook) setCurrBook(response.data.book._id);
+        }
         return {
             success: true,
             data: response.data,
             message: response.data.message || 'Book added successfully'
         };
-
     } catch (error) {
         console.error('Error adding book to database:', error);
 
-        // Handle different error types
         if (error.response) {
-            // Server responded with error status
             return {
                 success: false,
                 message: error.response.data.message || 'Server error occurred',
@@ -121,14 +235,12 @@ const addBookToDb = async (bookData) => {
                 data: error.response.data
             };
         } else if (error.request) {
-            // Request was made but no response received
             return {
                 success: false,
                 message: 'No response from server. Please check your connection.',
                 error: 'NETWORK_ERROR'
             };
         } else {
-            // Something else happened
             return {
                 success: false,
                 message: 'An unexpected error occurred',
@@ -138,25 +250,30 @@ const addBookToDb = async (bookData) => {
     }
 };
 
-// Function to fetch current book status
-const fetchBookStatus = async (bookId) => {
+/**
+ * Fetch book status and set state via setter.
+ */
+export const fetchBookStatus = async (bookId, setCurrBookStatus) => {
     try {
         const response = await securedApi.get(`/api/userdata/${bookId}/status`);
-
         if (response.data.success) {
-            setCurrBookStatus(response.data.userBook);
+            if (setCurrBookStatus) setCurrBookStatus(response.data.userBook);
+            return response.data.userBook;
         } else {
-            console.log('No status found for this book');
-            setCurrBookStatus(null);
+            if (setCurrBookStatus) setCurrBookStatus(null);
+            return null;
         }
     } catch (error) {
         console.error('Error fetching book status:', error);
-        // Set to null if no status exists or error occurs
-        setCurrBookStatus(null);
+        if (setCurrBookStatus) setCurrBookStatus(null);
+        return null;
     }
 };
 
-const createBookData = (book, imgLink) => {
+/**
+ * Create sanitized book object for DB upload.
+ */
+export const createBookData = (book, imgLink) => {
     const bookData = {
         title: book?.title,
         author_name: book?.author_name || [],
@@ -177,7 +294,7 @@ const createBookData = (book, imgLink) => {
         }
     };
 
-    // Clean up null/undefined values
+    // Clean up null/undefined/empty arrays
     Object.keys(bookData).forEach(key => {
         if (bookData[key] === null || bookData[key] === undefined ||
             (Array.isArray(bookData[key]) && bookData[key].length === 0)) {
@@ -185,7 +302,6 @@ const createBookData = (book, imgLink) => {
         }
     });
 
-    // Clean up externalIds
     if (bookData.externalIds) {
         Object.keys(bookData.externalIds).forEach(key => {
             if (bookData.externalIds[key] === null || bookData.externalIds[key] === undefined) {
@@ -201,31 +317,22 @@ const createBookData = (book, imgLink) => {
     return bookData;
 };
 
-// Handle status update
-const handleStatusUpdate = async (statusData, isbn) => {
+/** --- Status Update --- */
+
+/**
+ * Update user-book status on server and set local state via setter.
+ */
+export const handleStatusUpdate = async (statusData, isbn, setCurrBookStatus) => {
     try {
-        const token = localStorage.getItem('authToken'); // Adjust based on how you store auth token
-        // console.log(isbn)
-
-        const response = await securedApi.post(
-            `/api/userdata/${isbn}/status`,
-            statusData
-        );
-
-        const result = response.data;
-
-        if (result.success) {
-            console.log('Status updated successfully:', result);
-            // Update the current book status state
-            setCurrBookStatus(result.userBook);
-            // You can add success notification here
+        const response = await securedApi.post(`/api/userdata/${isbn}/status`, statusData);
+        if (response.data.success) {
+            if (setCurrBookStatus) setCurrBookStatus(response.data.userBook);
+            return response.data.userBook;
         } else {
-            throw new Error(result.message || 'Failed to update status');
+            throw new Error(response.data.message || 'Failed to update status');
         }
     } catch (error) {
         console.error('Error updating status:', error);
-        throw error; // Re-throw to let modal handle the error
+        throw error;
     }
 };
-
-export { handleSubmitReview, handleRatingChange, handleStatusUpdate, createBookData, fetchBookStatus, cleanSubjects, loadBookAndDescription, loadCover, addBookToDb }

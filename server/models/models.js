@@ -85,7 +85,7 @@ const userBookSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['read', 'reading', 'plan-to-read', 'undefined'],
+    enum: ['read', 'reading', 'plan-to-read', 'on-hold', 'undefined'],
     required: true
   },
   isFavorite: {
@@ -94,7 +94,7 @@ const userBookSchema = new Schema({
   },
   rating: {
     type: Number,
-    min: 1,
+    min: .5,
     max: 5,
     default: null
   },
@@ -184,7 +184,7 @@ const reviewSchema = new Schema({
   },
   rating: {
     type: Number,
-    min: 1,
+    min: .5,
     max: 5
   },
   editHistory: [{
@@ -223,7 +223,6 @@ const listSchema = new Schema({
     enum: ['public', 'private', 'friends'],
     default: 'public'
   },
-  tags: [String],
   books: [{
     bookId: {
       type: Schema.Types.ObjectId,
@@ -234,20 +233,11 @@ const listSchema = new Schema({
       type: Date,
       default: Date.now
     },
-    note: {
-      type: String,
-      maxlength: 500,
-      default: ''
-    },
     order: {
       type: Number,
       default: 0
     }
   }],
-  followers: {
-    type: Number,
-    default: 0
-  },
   likes: {
     type: Number,
     default: 0

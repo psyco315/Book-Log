@@ -1,11 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AuroraText } from '../MagicUi/AuroraText'
 import { TypingAnimation } from '../MagicUi/TypingAnimation'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import bgImg from '../../assets/bgImg.png'
 import './landing.css'
 
 const Landing = () => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearchChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            // Navigate to search page with query parameter
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     return (
         <div
             className='bgBox relative flex flex-col justify-center items-center text-white hover:cursor-default'
@@ -27,8 +47,25 @@ const Landing = () => {
                         Looking for something?
                     </div>
                     <div className='flex justify-around items-center w-full'>
-                        <input type="text" placeholder='Enter book/author' className='searchInp bg-white/10 placeholder:text-white/30 text-white rounded-bl rounded-tl' />
-                        <button className='yellowBtn bg-[#FFE434] text-black rounded-br rounded-tr hover:scale-105 transition-transform duration-100 hover:cursor-pointer hover:bg-[#9a8a20] hover:text-white'>Search</button>
+                        <input 
+                            type="text" 
+                            placeholder='Enter book/author' 
+                            className='searchInp bg-white/10 placeholder:text-white/30 text-white rounded-bl rounded-tl'
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            onKeyPress={handleKeyPress}
+                        />
+                        <button 
+                            className={`yellowBtn rounded-br rounded-tr hover:scale-105 transition-transform duration-100 hover:cursor-pointer ${
+                                searchQuery.trim() 
+                                    ? 'bg-[#FFE434] text-black hover:bg-[#9a8a20] hover:text-white' 
+                                    : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                            }`}
+                            onClick={handleSearch}
+                            disabled={!searchQuery.trim()}
+                        >
+                            Search
+                        </button>
                     </div>
                 </div>
 

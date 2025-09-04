@@ -6,6 +6,7 @@ const BookCollection = ({ groupTitle, bookData }) => {
     const itemsRef = useRef(null)
 
     useEffect(() => {
+        console.log(bookData)
         const el = itemsRef.current
         if (!el) return
 
@@ -34,9 +35,12 @@ const BookCollection = ({ groupTitle, bookData }) => {
                 className='cardBox flex overflow-x-auto'
                 ref={itemsRef}
             >
-                {bookData.map((item, index) => (
+                {bookData.length !== 0 ? bookData.map((item, index) => (
                     <BookCard key={index} data={item} />
-                ))}
+                ))
+                    :
+                    <></>
+                }
             </div>
         </div>
     )

@@ -3,19 +3,22 @@ import { UserBook, Book } from '../models/models.js';
 export const changeStatus = async (req, res) => {
     try {
         const { isbn } = req.params;
-        const { userId, status, isFavorite, rating, notes, tags, currentPage, totalPages } = req.body;
+        const { status, isFavorite, rating, notes, tags, currentPage, totalPages } = req.body;
+        const userId = req.user.userId
+        console.log({ status, isFavorite, rating, notes, tags, currentPage, totalPages })
+
 
         // Validate required fields
-        if (!isbn || !status) {
+        if (isFavorite===undefined && (!isbn || !status)) {
             return res.status(400).json({
                 success: false,
-                message: 'ISBN and status are required'
+                message: 'Favourite or ISBN and status are required'
             });
         }
 
         // Validate status value
-        const validStatuses = ['read', 'reading', 'plan-to-read', 'undefined'];
-        if (!validStatuses.includes(status)) {
+        const validStatuses = ['read', 'reading', 'on-hold', 'plan-to-read', 'undefined'];
+        if (status && !validStatuses.includes(status)) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid status. Must be one of: read, reading, plan-to-read, undefined'
@@ -23,7 +26,7 @@ export const changeStatus = async (req, res) => {
         }
 
         // Validate rating if provided
-        if (rating !== undefined && rating !== null && (rating < 1 || rating > 5)) {
+        if (rating !== undefined && rating !== null && (rating < .5 || rating > 5)) {
             return res.status(400).json({
                 success: false,
                 message: 'Rating must be between 1 and 5'
@@ -55,11 +58,11 @@ export const changeStatus = async (req, res) => {
         // Prepare update data
         const updateData = {
             userId,
-            bookId,
-            status
+            bookId
         };
 
         // Add optional fields if provided
+        if (status !== undefined) updateData.status = status;
         if (isFavorite !== undefined) updateData.isFavorite = isFavorite;
         if (rating !== undefined && rating !== null) updateData.rating = rating;
         if (notes !== undefined) updateData.notes = notes;
@@ -208,7 +211,7 @@ export const getBookStatus = async (req, res) => {
 // Controller to get all user books
 export const getUserBooks = async (req, res) => {
     try {
-        const userId = req.params.userId || req.user.id;
+        const userId = req.user.userId || req.user.id;
         const { status, limit = 50, page = 1 } = req.query;
 
         // Build query

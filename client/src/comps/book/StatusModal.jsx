@@ -146,6 +146,7 @@ const StatusModal = ({ isOpen, onClose, book, currentStatus, onStatusUpdate }) =
                                 <option value="undefined">Not Set</option>
                                 <option value="plan-to-read">Plan to Read</option>
                                 <option value="reading">Currently Reading</option>
+                                <option value="on-hold">On hold</option>
                                 <option value="read">Finished</option>
                             </select>
                         </div>

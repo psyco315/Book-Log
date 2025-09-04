@@ -4,22 +4,36 @@ import { fetchBooks } from '../getData'
 
 const MainBody = () => {
 
-    const [tempData, setTempData] = useState([])
+    const [data1, setData1] = useState([])
+    const [data2, setData2] = useState([])
 
     useEffect(() => {
-        const loadBooks = async () => {
+        const loadBooks1 = async (subj) => {
             try {
                 const data = await fetchBooks({ subject: "fiction" });
                 if (data) {
                     // console.log(data.data.books)
-                    setTempData(data.data.books); // update state
+                    setData1(data.data.books) // update state
                 }
             } catch (err) {
                 // console.error("Failed to fetch books:", err);
             }
         };
+        const loadBooks2 = async (subj) => {
+            try {
+                const data = await fetchBooks({ subject: "non_fiction" });
+                if (data) {
+                    // console.log(data.data.books)
+                    setData2(data.data.books)  // update state
+                }
+            } catch (err) {
+                // console.error("Failed to fetch books:", err);
+            }
+        };
+    
 
-        loadBooks();
+        loadBooks1();
+        loadBooks2();
     }, []);
 
     // useEffect(() => {
@@ -30,9 +44,8 @@ const MainBody = () => {
 
     return (
         <div>
-            <BookCollection groupTitle={'Trending books of 2025'} bookData={tempData} />
-            <BookCollection groupTitle={'Popular Fiction'} bookData={tempData} />
-            <BookCollection groupTitle={'Popular Non-Fiction'} bookData={tempData} />
+            <BookCollection groupTitle={'Popular Fiction'} bookData={data1} />
+            <BookCollection groupTitle={'Popular Non-Fiction'} bookData={data2} />
         </div>
     )
 }
