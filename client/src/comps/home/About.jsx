@@ -26,21 +26,17 @@ const About = () => {
 
             <div className="text-white">
               <p>
-                Hi! I'm Parth, a passionate developer and book enthusiast who created BookStop
-                to help fellow readers organize and track their literary journeys.
+                Konichiwa mina san, I'm Parth (not japanese). I'm a student and I code for fun (and for corporate enslavement).
               </p>
 
               <p>
-                BookStop is a personal project born out of my love for reading and
-                coding. It's designed to be a simple yet powerful tool for book
-                lovers to discover new titles, track their reading progress, and
-                build meaningful reading habits.
+                BookStop was made lowkey to be shown on my resume but I realised that it can actually be deployed as an actual product and here we are.
               </p>
 
               <p>
                 Whether you're looking to organize your reading list, discover your
                 next great read, or simply keep track of the books you've enjoyed,
-                BookStop is here to make your reading experience better.
+                BookStop is here to make your reading experience better (AI wrote this and I'm NOT sorry). 
               </p>
             </div>
           </motion.div>

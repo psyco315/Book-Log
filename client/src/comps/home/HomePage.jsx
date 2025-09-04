@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Navbar from './Navbar'
 import MainBody from './MainBody'
 import About from './About'
+import GetStarted from './GetStarted.jsx'
 import './HomePage.css'
 
 import { motion } from 'motion/react'
@@ -20,7 +21,8 @@ const HomePage = () => {
           ease: "easeOut"
         }}
       >
-        <MainBody />
+        {/* <MainBody /> */}
+        <GetStarted />
         <About />
         
       </motion.div>
