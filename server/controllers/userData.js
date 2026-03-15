@@ -5,7 +5,6 @@ export const changeStatus = async (req, res) => {
         const { isbn } = req.params;
         const { status, isFavorite, rating, notes, tags, currentPage, totalPages } = req.body;
         const userId = req.user.userId
-        console.log({ status, isFavorite, rating, notes, tags, currentPage, totalPages })
 
 
         // Validate required fields
@@ -163,9 +162,6 @@ export const getBookStatus = async (req, res) => {
         const { bookId } = req.params;
         const userId = req.user.userId
 
-        // console.log('Extracted bookId:', bookId);
-        // console.log('Extracted userId:', userId);
-
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -192,7 +188,6 @@ export const getBookStatus = async (req, res) => {
             });
         }
 
-        // console.log('Found userBook:', userBook);
         res.status(200).json({
             success: true,
             userBook: userBook
@@ -221,13 +216,13 @@ export const getUserBooks = async (req, res) => {
         }
 
         // Calculate pagination
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        // const skip = (parseInt(page) - 1) * parseInt(limit);
 
         const userBooks = await UserBook.find(query)
-            .populate('bookId', 'title authors coverImage publishedDate genres averageRating')
+            .populate('bookId', 'title authors isbn')
             .sort({ 'dates.addedToList': -1 })
-            .skip(skip)
-            .limit(parseInt(limit));
+            // .skip(skip)
+            // .limit(parseInt(limit));
 
         const total = await UserBook.countDocuments(query);
 

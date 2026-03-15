@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
 import { motion } from 'framer-motion';
-import { securedApi } from '../api';
+import { securedApi, publicApi } from '../api';
+import { Link } from 'react-router-dom';
 
 import Navbar from '../home/Navbar';
+import BookCard from '../BookCard';
 import './profilepage.css';
+import defaultCover from '../../assets/defCover.png'
 
 const ProfilePage = () => {
     const { currUser, loggedIn } = useAuth();
@@ -16,6 +19,7 @@ const ProfilePage = () => {
         booksRead: 0,
         currentlyReading: 0,
         planToRead: 0,
+        onHold: 0,
         favorites: 0,
         reviews: 0
     });
@@ -23,92 +27,186 @@ const ProfilePage = () => {
         read: [],
         reading: [],
         planToRead: [],
+        onHold: [],
+        notDefined: [],
         favorites: []
     });
+    const [favorite, setFavorite] = useState([]);
+    const [bookRatings, setBookRatings] = useState([]);
+    const [userReviews, setUserReviews] = useState([]);
+    const [bookStatuses, setBookStatuses] = useState([]);
+
+    // Fetch book status for a specific book
+    const fetchBookStatus = async () => {
+        try {
+            const response = await securedApi.get(`api/userdata/user/books`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching book status`, error);
+            return null;
+        }
+    };
+
+    // Fetch user reviews and ratings
+    const fetchUserReviews = async (userId) => {
+        try {
+            const response = await publicApi.get(`api/review/user/${userId}`);
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching user reviews for ${userId}:`, error);
+            return [];
+        }
+    };
+
+    const fetchUserProfile = async () => {
+        if (!loggedIn || !currUser) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setUserProfile(currUser);
+
+            // Fetch user reviews and ratings
+            const reviewsData = await fetchUserReviews(currUser._id || currUser.id);
+            setUserReviews(reviewsData.reviews || []);
+
+            // If reviewsData contains books information, process it
+            try {
+                const status = await fetchBookStatus()
+                if (status?.books) {
+                    setBookStatuses(status.books)
+                }
+            } catch (error) {
+                console.error('Error fetching book status:', error);
+                setError('Failed to load book status. Please try again.');
+            }
+
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            setError('Failed to load profile data. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const populateBooks = () => {
+        if (bookStatuses.length === 0) return;
+
+        let bookList = {
+            read: [],
+            reading: [],
+            planToRead: [],
+            onHold: [],
+            favorites: []
+        };
+
+        bookStatuses.forEach((book) => {
+            const bookVal = {
+                bookId: book.bookId,
+                isFavourite: book.isFavourite,
+                rating: book.rating,
+                status: book.status,
+                tags: book.tags,
+                coverImage: book.coverImage
+            };
+
+            if (book.status === 'read') {
+                bookList.read.push(bookVal);
+            } else if (book.status === 'reading') {
+                bookList.reading.push(bookVal);
+            } else if (book.status === 'on-hold') {
+                bookList.onHold.push(bookVal);
+            } else if (book.status === 'plan-to-read') {
+                bookList.planToRead.push(bookVal);
+            }
+
+            if (book.isFavourite) {
+                bookList.favorites.push(bookVal);
+            }
+        });
+
+        // replace the previous books state with the new categorization
+        setUserBooks(bookList);
+    }
 
     // Fetch user profile data
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            if (!loggedIn || !currUser) {
-                setLoading(false);
-                return;
-            }
-
-            setUserProfile(currUser);
-
-            // You can also fetch user stats and books here
-            // For now, keeping the mock data for stats and books
-            setUserStats({
-                booksRead: 42,
-                currentlyReading: 3,
-                planToRead: 15,
-                favorites: 8,
-                reviews: 12
-            });
-
-            setUserBooks({
-                read: [
-                    { id: 1, title: "The Great Gatsby", author: "F. Scott Fitzgerald", cover: "/api/placeholder/200/300" },
-                    { id: 2, title: "To Kill a Mockingbird", author: "Harper Lee", cover: "/api/placeholder/200/300" },
-                    { id: 3, title: "1984", author: "George Orwell", cover: "/api/placeholder/200/300" }
-                ],
-                reading: [
-                    { id: 4, title: "Dune", author: "Frank Herbert", cover: "/api/placeholder/200/300", progress: 65 },
-                    { id: 5, title: "The Hobbit", author: "J.R.R. Tolkien", cover: "/api/placeholder/200/300", progress: 23 }
-                ],
-                planToRead: [
-                    { id: 6, title: "Pride and Prejudice", author: "Jane Austen", cover: "/api/placeholder/200/300" },
-                    { id: 7, title: "The Catcher in the Rye", author: "J.D. Salinger", cover: "/api/placeholder/200/300" }
-                ],
-                favorites: [
-                    { id: 8, title: "Lord of the Rings", author: "J.R.R. Tolkien", cover: "/api/placeholder/200/300" },
-                    { id: 9, title: "Harry Potter Series", author: "J.K. Rowling", cover: "/api/placeholder/200/300" }
-                ]
-            });
-
-            setLoading(false)
-        };
-
         fetchUserProfile();
     }, [loggedIn, currUser]);
+
+    useEffect(() => {
+        populateBooks();
+    }, [bookStatuses]);
+
+    // recalculate statistics whenever the book lists or user reviews change
+    useEffect(() => {
+        setUserStats({
+            booksRead: userBooks.read.length,
+            currentlyReading: userBooks.reading.length,
+            planToRead: userBooks.planToRead.length,
+            onHold: userBooks.onHold.length1,
+            favorites: userBooks.favorites.length
+        })
+    }, [userBooks, userReviews]);
 
     const tabs = [
         { id: 'overview', label: 'Overview' },
         { id: 'read', label: 'Read' },
         { id: 'reading', label: 'Currently Reading' },
         { id: 'planToRead', label: 'Plan to Read' },
-        { id: 'favorites', label: 'Favorites' }
+        { id: 'favorites', label: 'Favorites' },
+        { id: 'reviews', label: 'Reviews' }
     ];
 
     const renderBookGrid = (books, showProgress = false) => {
+        if (!books || books.length === 0) {
+            return (
+                <div className="emptyState">
+                    <p>No books found in this category.</p>
+                </div>
+            );
+        }
+
         return (
             <div className="bookGrid">
                 {books.map((book, index) => (
+                    <BookCard data={book.bookId} key={index}/>
+                ))}
+            </div>
+        );
+    };
+
+    const renderReviews = () => {
+        if (!userReviews || userReviews.length === 0) {
+            return (
+                <div className="emptyState">
+                    <p>No reviews written yet.</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="reviewsGrid">
+                {userReviews.map((review, index) => (
                     <motion.div
-                        key={book.id}
+                        key={review.id || index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bookCard"
+                        className="reviewCard"
                     >
-                        <div className="bookCardImageContainer">
-                            {/* <img
-                                src={book.cover}
-                                alt={book.title}
-                                className="bookCardImage"
-                                onError={(e) => {
-                                    e.target.src = `https://via.placeholder.com/200x300/444/fff?text=${encodeURIComponent(book.title)}`;
-                                }}
-                            /> */}
-                            {showProgress && book.progress && (
-                                <div className="progressOverlay">
-                                    {book.progress}% Complete
-                                </div>
-                            )}
+                        <div className="reviewHeader">
+                            <h4 className="reviewBookTitle">{review.bookTitle}</h4>
+                            <div className="reviewRating">
+                                {'⭐'.repeat(review.rating || 0)}
+                            </div>
                         </div>
-                        <div className="bookCardInfo">
-                            <h3 className="bookCardTitle">{book.title}</h3>
-                            <p className="bookCardAuthor">{book.author}</p>
+                        <p className="reviewText">{review.text || review.content}</p>
+                        <div className="reviewMeta">
+                            <span className="reviewDate">
+                                {new Date(review.createdAt || review.date).toLocaleDateString()}
+                            </span>
                         </div>
                     </motion.div>
                 ))}
@@ -145,16 +243,20 @@ const ProfilePage = () => {
                             </div>
                         </div>
 
-                        {/* Recent Activity */}
-                        <div className="profileSection">
-                            <div className="sectionTitle">Recent Activity</div>
-                            <div className="activityCard">
-                                <div className="activityItem">📖 Started reading "Dune" by Frank Herbert</div>
-                                <div className="activityItem">⭐ Rated "The Great Gatsby" 5 stars</div>
-                                <div className="activityItem">❤️ Added "Pride and Prejudice" to favorites</div>
-                                <div className="activityItem">✅ Finished reading "1984" by George Orwell</div>
+                        {/* Recent Reviews */}
+                        {userReviews.length > 0 && (
+                            <div className="profileSection">
+                                <div className="sectionTitle">Recent Reviews</div>
+                                <div className="activityCard">
+                                    {userReviews.slice(0, 4).map((review, index) => (
+                                        <div key={index} className="activityItem">
+                                            ⭐ Rated "{review.bookTitle}" {review.rating} stars
+                                            {review.text && ` - "${review.text.substring(0, 60)}${review.text.length > 60 ? '...' : ''}"`}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Currently Reading Preview */}
                         {userBooks.reading.length > 0 && (
@@ -171,8 +273,12 @@ const ProfilePage = () => {
                 return renderBookGrid(userBooks.reading, true);
             case 'planToRead':
                 return renderBookGrid(userBooks.planToRead);
+            case 'onHold':
+                return renderBookGrid(userBooks.onHold);
             case 'favorites':
                 return renderBookGrid(userBooks.favorites);
+            case 'reviews':
+                return renderReviews();
             default:
                 return null;
         }
@@ -228,9 +334,9 @@ const ProfilePage = () => {
             <Navbar />
 
             <motion.div className="profileContentBox"
-                initial={{ opacity: 0,}}
-                animate={{ opacity: 1}}
-                transition={{duration:.6}}
+                initial={{ opacity: 0, }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: .6 }}
             >
                 {/* Profile Header */}
                 <motion.div

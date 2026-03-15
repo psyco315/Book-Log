@@ -6,7 +6,6 @@ const BookCollection = ({ groupTitle, bookData }) => {
     const itemsRef = useRef(null)
 
     useEffect(() => {
-        console.log(bookData)
         const el = itemsRef.current
         if (!el) return
 

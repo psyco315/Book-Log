@@ -38,32 +38,19 @@ const Search = () => {
     }
 
     const searchBooks = async (page = 1) => {
-        // console.log("Halo")
         if (!query.trim() && !subject.trim()) return
 
         setLoading(true)
         setError(null)
 
         try {
-            // console.log("Fetching data for page:", page, "Query:", query)
             let reqData = { page: page, limit: 12 }
-            if (subject === '') {
-                if (searchType === "all") {
-                    reqData.q = query
-                }
-                else if (searchType === "book") {
-                    reqData.title = query
-                }
-                else if (searchType === "author") {
-                    reqData.author = query
-                }
-            }
-            else{
+            if(subject) {
                 reqData.subject = subject
             }
-            // console.log("Searching for:", reqData)
+            reqData.title = query
+            
             const data = await fetchBooks(reqData)
-            console.log("Data fetched successfully:", data.data)
 
             setBooks(data.data.books || [])
             setTotalResults(data.data.total || 0)
@@ -83,8 +70,6 @@ const Search = () => {
 
     // Main effect: search when query or page changes
     useEffect(() => {
-        // console.log("Effect triggered - Query:", query, "Subject:", subject, "Page:", currentPage)
-
         if (query.trim() || subject.trim()) {
             searchBooks(currentPage)
         } else {
@@ -98,7 +83,7 @@ const Search = () => {
         if (isInitialMount.current) {
             isInitialMount.current = false
         }
-    }, [query, currentPage, searchType])
+    }, [currentPage, searchType])
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages && newPage !== currentPage) {
@@ -206,7 +191,7 @@ const Search = () => {
                     </h1>
 
                     {/* Search Type Filter */}
-                    {(query || subject) && (
+                    {/* {(query || subject) && (
                         <div className="searchTypeContainer">
                             <div className="searchTypeButtons">
                                 <button
@@ -229,12 +214,12 @@ const Search = () => {
                                 </button>
                             </div>
                         </div>
-                    )}
+                    )} */}
 
                     {!loading && totalResults > 0 && (
                         <p className="searchCount">
                             {totalResults.toLocaleString()} found
-                            {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`}
+                            {/* {totalPages > 1 && ` • Page ${currentPage} of ${totalPages}`} */}
                         </p>
                     )}
                 </div>
@@ -288,49 +273,7 @@ const Search = () => {
                             </div>
 
                             {/* Pagination Controls */}
-                            {totalPages > 1 && (
-                                <motion.div
-                                    className="paginationContainer"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{
-                                        duration: 0.4,
-                                        delay: 0.2,
-                                        ease: "easeOut"
-                                    }}
-                                >
-                                    <div className="paginationControls">
-                                        {/* Previous Button */}
-                                        <button
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={currentPage === 1}
-                                            className="paginationArrow"
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" />
-                                            </svg>
-                                            Previous
-                                        </button>
-
-                                        {/* Page Numbers */}
-                                        <div className="paginationNumbers">
-                                            {renderPaginationButtons()}
-                                        </div>
-
-                                        {/* Next Button */}
-                                        <button
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage === totalPages}
-                                            className="paginationArrow"
-                                        >
-                                            Next
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M8.59 16.59L10 18L16 12L10 6L8.59 7.41L13.17 12L8.59 16.59Z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
+                            
                         </>
                     ) : (
                         <div className="noQuery">

@@ -229,6 +229,17 @@
   text-align: center;
 }
 
+.ratingOverlay {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
 .bookCardInfo {
   padding: 0.75rem;
 }
@@ -253,6 +264,140 @@
   -webkit-line-clamp: 1;
   line-clamp: 1;
   overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.bookCardDate {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.7rem;
+}
+
+/* Reviews Section */
+.reviewsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.reviewCard {
+  background: rgba(55, 55, 70, 0.8);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.reviewBookTitle {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+}
+
+.reviewRating {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.reviewText {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.reviewMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reviewDate {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.emptyState p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+}
+
+/* Loading and Error States */
+.loadingSpinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #8B5CF6;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  gap: 1rem;
+}
+
+.errorMessage h2 {
+  color: #ef4444;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.errorMessage p {
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.errorMessage button {
+  background: linear-gradient(135deg, #8B5CF6, #A855F7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.errorMessage button:hover {
+  background: linear-gradient(135deg, #7C3AED, #9333EA);
 }
 
 /* Sign In Prompt */
@@ -303,6 +448,10 @@
 
   .sectionTitle {
     font-size: 1.75rem;
+  }
+
+  .reviewsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -372,6 +521,12 @@
   .bookCardImage {
     height: 10rem;
   }
+
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
 /* Mobile Large - ≤ 575px */
@@ -422,6 +577,18 @@
   .bookCardAuthor {
     font-size: 0.7rem;
   }
+
+  .reviewCard {
+    padding: 0.75rem;
+  }
+
+  .reviewBookTitle {
+    font-size: 0.9rem;
+  }
+
+  .reviewText {
+    font-size: 0.8rem;
+  }
 }
 
 /* Mobile Small - ≤ 320px */
@@ -460,6 +627,22 @@
 
   .statLabel {
     font-size: 0.7rem;
+  }
+
+  .reviewCard {
+    padding: 0.5rem;
+  }
+
+  .reviewBookTitle {
+    font-size: 0.85rem;
+  }
+
+  .reviewText {
+    font-size: 0.75rem;
+  }
+
+  .reviewRating {
+    font-size: 0.9rem;
   }
 }
 

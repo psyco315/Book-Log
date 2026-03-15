@@ -16,7 +16,7 @@ const fields = [
     'lccn'
 ].join(',');
 
-export const searchBooks = async (req, res) => {
+export const searchBooks = async (req, res, Book) => {
     try {
         const {
             q = '',
@@ -26,11 +26,10 @@ export const searchBooks = async (req, res) => {
             isbn = '',
             sort = 'readinglog',
             page = '1',
-            limit = '10'
+            limit = 12
         } = req.query;
 
-        // console.log(req.query)
-
+        // Validate that at least one search parameter is provided
         if (!q && !title && !author && !subject && !isbn) {
             return res.status(400).json({
                 success: false,
@@ -38,48 +37,74 @@ export const searchBooks = async (req, res) => {
             });
         }
 
-        const params = {
-            q: q,
-            fields: fields,
-            sort: sort,
-            page: page,
-            limit: limit
+        // Convert page and limit to numbers
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
+
+        // Build search query
+        const searchQuery = {};
+
+        if (q) {
+            // General search across multiple fields
+            searchQuery.$or = [
+                { title: { $regex: q, $options: 'i' } },
+                { authors: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } },
+                { subject: { $regex: q, $options: 'i' } },
+                { isbn: { $regex: q, $options: 'i' } }
+            ];
         }
 
+        // Add specific field searches
         if (title) {
-            params['title'] = title
+            searchQuery.title = { $regex: title, $options: 'i' };
         }
         if (author) {
-            params['author'] = author
+            searchQuery.authors = { $regex: author, $options: 'i' };
         }
         if (subject) {
-            params['subject'] = subject
+            searchQuery.subject = { $regex: subject, $options: 'i' };
         }
         if (isbn) {
-            params['isbn'] = isbn
-        }
-        if (limit) {
-            params['limit'] = limit
+            searchQuery.isbn = { $regex: isbn.replace(/[-\s]/g, ''), $options: 'i' };
         }
 
-        const response = await axios.get(OPEN_LIBRARY_URL, {
-            params
-        });
+        // Determine sort order
+        let sortOptions = {};
+        switch (sort) {
+            case 'title':
+                sortOptions.title = 1;
+                break;
+            case 'publishedDate':
+                sortOptions.publishedDate = -1;
+                break;
+            case 'rating':
+                sortOptions.averageRating = -1;
+                break;
+            case 'readinglog':
+                sortOptions.readingLogCount = -1;
+                break;
+            default:
+                sortOptions.readingLogCount = -1;
+        }
 
-        // console.log("Suces")
+        // Execute query with pagination
+        const books = await Book.find(searchQuery)
+            .sort(sortOptions)
+            // .skip(0)
+            // .limit(limitNum);
 
-        const { docs, numFound, start } = response.data;
-        // console.log(docs)
-
-        // const imgUrl = await getBookCoverLink(title, author)
+        // Get total count for pagination
+        const total = await Book.countDocuments(searchQuery);
 
         res.status(200).json({
             success: true,
             data: {
-                books: docs,
-                total: numFound,
-                page: start / limit + 1,
-                totalPages: Math.ceil(numFound / limit)
+                books,
+                total,
+                page: pageNum,
+                totalPages: Math.ceil(total / limitNum)
             }
         });
 
@@ -266,7 +291,6 @@ export const uploadBook = async (req, res, Book) => {
 export const getBook = async (req, res, Book) => {
     try {
         const { isbn } = req.params;
-        console.log(isbn)
 
         // Validate ISBN parameter
         if (!isbn || typeof isbn !== 'string' || isbn.trim() === '') {
@@ -337,8 +361,6 @@ export const searchAuthors = async (req, res) => {
             });
         }
 
-        // console.log(`Searching for author: ${q}`);
-
         const response = await axios.get(AUTHOR_SEARCH_URL, {
             params: { q }
         });
@@ -352,7 +374,6 @@ export const searchAuthors = async (req, res) => {
         }
 
         const authorKeys = response.data.docs.map(author => author.key?.replace('/authors/', '')).filter(Boolean);
-        // console.log(`Found ${authorKeys.join(',')} authors for query: ${q}`);
 
         // Fetch detailed information for each author
         const authorDetails = await Promise.all(
@@ -405,8 +426,6 @@ export const getAuthor = async (req, res) => {
                 message: 'Invalid author key format. Should be like OL123A'
             });
         }
-
-        // console.log(`Fetching author details for: ${authorKey}`);
 
         const response = await axios.get(`${AUTHOR_URL}/${authorKey}.json`);
 

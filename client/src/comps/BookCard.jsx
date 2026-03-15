@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios';
+import { fetchBooks } from './getData';
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom';
 import Lottie from 'react-lottie-player'
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { imgFunc1, imgFunc2, imgFunc3 } from './getData';
+// import { imgFunc1, imgFunc2, imgFunc3 } from './getData';
 import defaultCover from '../assets/defCover.png'
 import loadingCover from '../assets/loadCover.png'
 import loadingAnimation from '../assets/loading_gray.json'
@@ -13,27 +15,12 @@ import './home/HomePage.css'
 
 const BookCard = ({ data }) => {
     const {
-        author_key,
         author_name,
         title,
-        lccn,
-        isbn,
-        first_publish_year,
-        language,
-        number_of_pages_median,
-        subject,
-        ratings_average,
-        readinglog_count,
+        isbn
     } = data;
 
-    // console.log({
-    //     author_name,
-    //     title,
-    //     lccn,
-    //     isbn,
-    // })
-
-    if(!isbn || isbn.length === 0){
+    if (!isbn || isbn.length === 0) {
         return
     }
 
@@ -41,41 +28,30 @@ const BookCard = ({ data }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
 
-    const loadCover = async () => {
+    const loadBook = async () => {
         try {
-            setIsLoading(true);
-            // console.log('Finding img with API')
-            let coverUrl = await imgFunc1(title, author_name);
+            const bookData = await fetchBooks({ isbn: isbn });
+            if (bookData?.data) {
+                const finalData = bookData.data.books[0];
 
-            if (!coverUrl) {
-                // console.log('Finding img with lccn')
-                coverUrl = await imgFunc2(lccn, title);
+                if (finalData.ratings_average) {
+                    finalData.ratings_average = parseFloat(finalData.ratings_average).toFixed(1);
+                }
+
+                setImgLink(finalData.coverImage)
+                setIsLoading(false)
             }
-
-            if (!coverUrl) {
-                // console.log('Finding img with isbn')
-                coverUrl = await imgFunc3(isbn, title);
-            }
-
-            if (coverUrl) {
-                // console.log("Final:", title, "-", coverUrl)
-                setImgLink(coverUrl);
-            }
-
-        } catch (error) {
-            console.error('Error loading cover:', error);
-            setImgLink(defaultCover);
-        } finally {
-            setIsLoading(false);
+        } catch (err) {
+            console.error("Failed to fetch book:", err);
         }
-    };
+    }
 
     useEffect(() => {
-        loadCover();
-    }, [lccn, title, author_name]);
+        loadBook();
+    }, [title, author_name]);
 
     return (
-        <Link to={`/book/${isbn[0]}`} className=' flex-shrink-0'>
+        <Link to={`/book/${isbn}`} className=' flex-shrink-0'>
             <motion.div className='inline-block relative overflow-hidden flex-shrink-0 cursor-pointer w-fit'>
                 <div className='group relative w-full h-full'
                     onMouseEnter={() => setIsHovered(true)}

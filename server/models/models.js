@@ -41,7 +41,7 @@ const userSchema = new Schema({
 
 // --- Books Schema: remove field-level sparse and rely on schema.index(...) ---
 const bookSchema = new Schema({
-  title: { type: String, required: true, trim: true },
+  title: [{ type: String, required: true, trim: true }],
   authors: [{ type: String, required: true }],
   isbn: { type: String, required: true, trim: true },
   lccn: {
@@ -87,6 +87,10 @@ const userBookSchema = new Schema({
     type: String,
     enum: ['read', 'reading', 'plan-to-read', 'on-hold', 'undefined'],
     required: true
+  },
+  coverImage: {
+    type: String,
+    default: 'notFound'
   },
   isFavorite: {
     type: Boolean,
@@ -170,12 +174,13 @@ const reviewSchema = new Schema({
   userBookId: {
     type: Schema.Types.ObjectId,
     ref: 'UserBook',
-    default: null
+    required: true
   },
   title: {
     type: String,
     trim: true,
-    maxlength: 200
+    maxlength: 200,
+    default: ''
   },
   content: {
     type: String,

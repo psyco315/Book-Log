@@ -12,7 +12,6 @@ const MainBody = () => {
             try {
                 const data = await fetchBooks({ subject: "fiction" });
                 if (data) {
-                    // console.log(data.data.books)
                     setData1(data.data.books) // update state
                 }
             } catch (err) {
@@ -23,7 +22,6 @@ const MainBody = () => {
             try {
                 const data = await fetchBooks({ subject: "non_fiction" });
                 if (data) {
-                    // console.log(data.data.books)
                     setData2(data.data.books)  // update state
                 }
             } catch (err) {
@@ -35,12 +33,6 @@ const MainBody = () => {
         loadBooks1();
         loadBooks2();
     }, []);
-
-    // useEffect(() => {
-    //     if (tempData) {
-    //         console.log("Updated tempData:", tempData);
-    //     }
-    // }, [tempData]);
 
     return (
         <div>

@@ -5,8 +5,6 @@ import mongoose from 'mongoose';
 const validateReviewData = (data) => {
   const { rating, content, title } = data;
   
-    // console.log({ title, content, rating })
-  
   // Must have either rating or content (or both)
   if (!rating && !content) {
     return { isValid: false, error: 'Either rating or written review is required' };
@@ -53,8 +51,7 @@ export const createReview = async (req, res) => {
     // Create review object
     const reviewData = {
       userId,
-      bookId,
-      userBookId: userBookId || null
+      bookId
     };
 
     // Add optional fields if provided
@@ -163,7 +160,6 @@ export const getReviewById = async (req, res) => {
 // @route   PUT /api/reviews/:id
 // @access  Private
 export const updateReview = async (req, res) => {
-  // console.log("halor")
 
   try {
     const { id } = req.params;

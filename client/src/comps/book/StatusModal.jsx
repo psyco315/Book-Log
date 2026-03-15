@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/auth';
 import './book.css';
 import './statusmodal.css'
-import AuthModal from '../auth.js/AuthModal';
+import AuthModal from '../auth/AuthModal';
 
 const StatusModal = ({ isOpen, onClose, book, currentStatus, onStatusUpdate }) => {
     const { currUser, loggedIn, authModal, setAuthModal } = useAuth(); // Add loggedIn from useAuth
@@ -73,7 +73,7 @@ const StatusModal = ({ isOpen, onClose, book, currentStatus, onStatusUpdate }) =
                 payload[key] === undefined && delete payload[key]
             );
 
-            await onStatusUpdate(payload, book?.isbn?.[0] || book?.isbn);
+            await onStatusUpdate(payload, book?.isbn);
             onClose();
         } catch (error) {
             console.error('Error updating status:', error);

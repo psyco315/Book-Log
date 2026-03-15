@@ -75,7 +75,6 @@ const SignIn = ({ isOpen, onClose, onSwitchToSignUp, apiUrl }) => {
             const response = await publicApi.post(endpoint, payload);
 
             const { token, user } = response.data || {};
-            // console.log(user)
 
             if (token) {
                 localStorage.setItem('authToken', token);

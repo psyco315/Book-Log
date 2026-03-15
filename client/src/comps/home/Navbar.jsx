@@ -11,7 +11,7 @@ import { AnimatedGradientText } from "@/components/magicui/animated-gradient-tex
 import { motion } from "motion/react"
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/auth'
-import AuthModal from '../auth.js/AuthModal'
+import AuthModal from '../auth/AuthModal'
 
 const Navbar = () => {
     const { authModal, setAuthModal, loggedIn, setLoggedIn, setCurrUser, onSearch } = useAuth();
@@ -32,8 +32,19 @@ const Navbar = () => {
     const handleSearch = () => {
         if (searchQuery.trim()) {
             console.log('Searching for:', searchQuery);
-            // Navigate to search page with query parameter
-            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            // Navigate to search page with query parameter and force a reload of the component
+            const currentPath = window.location.pathname;
+            const searchPath = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
+            
+            if (currentPath === '/search') {
+                // If already on search page, update URL and trigger a reload
+                navigate(searchPath, { replace: true });
+                // Force a reload of the search results
+                window.location.reload();
+            } else {
+                // If coming from a different page, just navigate
+                navigate(searchPath);
+            }
         }
     };
 

@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Public routes
 router.route('/search')
-    .get(searchBooks);
+    .get((req, res) => searchBooks(req, res, Book));
 
 router.route('/db')
     .post((req, res) => uploadBook(req, res, Book));

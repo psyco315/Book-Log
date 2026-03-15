@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../home/Navbar';
 import { fetchBooks } from '../getData';
-import { imgFunc1, imgFunc2, imgFunc3 } from '../getData';
 import Lottie from 'react-lottie-player';
 import { useAuth } from '@/context/auth';
 
