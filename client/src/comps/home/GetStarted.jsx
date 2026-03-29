@@ -15,7 +15,7 @@ const GetStarted = () => {
         {
             id: 1,
             title: "Make an Account",
-            description: "Pretty self explanatory?",
+            description: "",
             icon: profileIcon,
             color: "from-orange-500/20 to-red-500/20"
         },

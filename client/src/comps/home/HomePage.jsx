@@ -23,7 +23,7 @@ const HomePage = () => {
       >
         {/* <MainBody /> */}
         <GetStarted />
-        <About />
+        {/* <About /> */}
         
       </motion.div>
     </div>

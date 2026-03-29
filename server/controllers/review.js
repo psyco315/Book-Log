@@ -51,7 +51,8 @@ export const createReview = async (req, res) => {
     // Create review object
     const reviewData = {
       userId,
-      bookId
+      bookId,
+      userBookId
     };
 
     // Add optional fields if provided

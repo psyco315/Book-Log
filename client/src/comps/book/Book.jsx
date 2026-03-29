@@ -45,10 +45,28 @@ const Book = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isFavoriteSubmitting, setIsFavoriteSubmitting] = useState(false);
     const [isListModalOpen, setIsListModalOpen] = useState(false);
+    const [userBook, setUserBook] = useState(null);
 
     const { currUser, loggedIn } = useAuth()
 
+
+    useEffect(() => {
+        const fetchUserBook = async () => {
+            try {
+                const data = await securedApi.get(`/api/userdata/${currBook}/status`)
+                if (data.data.userBook) {
+                    setUserBook(data.data.userBook._id);
+                }
+            } catch (err) {
+                console.error("Failed to fetch userBook:", err);
+            }
+        };
+
+        if (currBook) fetchUserBook();
+    }, [currBook]);
+
     // Fetch existing review for the current user and book
+    
     const fetchExistingReview = async (bookId) => {
         if (!loggedIn || !currUser || !bookId) return;
 
@@ -96,6 +114,7 @@ const Book = () => {
                 // Create new review with only rating
                 const reviewData = {
                     bookId: currBook,
+                    userBookId: userBook,
                     rating: newRating
                 };
 
@@ -173,6 +192,7 @@ const Book = () => {
                 const fullReviewData = {
                     ...reviewData,
                     bookId: currBook,
+                    userBookId: userBook,
                     rating: userRating || reviewData.rating
                 };
 
